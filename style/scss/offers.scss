@@ -1,0 +1,122 @@
+@use 'variables' as *;
+@use 'functions' as *;
+
+$card_background: $dark-gray;
+
+.container {
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.job-offer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid $light-gray;
+    border-radius: 5px;
+    background-color: $card_background;
+}
+
+.job-details {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.company-logo {
+    flex-grow: 0;
+
+    width: 5em;
+    min-width: 5em;
+    height: 5em;
+    margin-right: 1em;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
+.job-overview {
+    flex-grow: 1;
+    flex-direction: column;
+
+    .job-title {
+        font-size: map-get($header-sizes, h4);
+        font-weight: bold;
+    }
+
+    .company-name {
+        font-size: map-get($header-sizes, h5);
+        font-weight: bold;
+        color: $orange;
+    }
+}
+
+.job-payment {
+    padding: 0.5em;
+    border-radius: 5px;
+    background-color: blend($black, $dark-gray, 0.3);
+}
+
+.offer-deadline {
+    position: absolute;
+    top: -0.5em;
+    right: 10px;
+    background-color: none;
+    padding: 0 5px;
+    font-size: 1em;
+    font-weight: bold;
+    line-height: 1;
+    color: $orange;
+    z-index: 1;
+
+
+    &::before,&::after{
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 50%;
+        z-index: -1;
+    }
+    &::before {
+        top: 0;
+        background-color: $background;
+    }
+
+    &::after {
+        top: 50%;
+        background-color: $card_background;
+    }
+}
+
+// ====== Media queries ======
+@each $breakpoint,
+$value in $breakpoints {
+    $breakpoint-padding: map-get($content-padding, $breakpoint);
+
+    @if $breakpoint ==xs {
+        // Default styles set from mobile screens
+
+        .job-offer {
+            margin: $breakpoint-padding ;
+            padding: calc($breakpoint-padding/2);
+        }
+
+    }
+
+    @else {
+        @media only screen and (min-width: $value) {
+            // Styles for screens up to the current breakpoint
+
+            .job-offer {
+                margin: $breakpoint-padding ;
+                padding: calc($breakpoint-padding/2);
+            }
+        }
+    }
+}

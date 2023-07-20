@@ -1,0 +1,29 @@
+// Convert hex color values to rgb
+@function hexToRgb($hex) {
+  $red: red($hex);
+  $green: green($hex);
+  $blue: blue($hex);
+  @return rgb($red, $green, $blue);
+}
+
+// Blends golors together
+@function blend($color1, $color2, $ratio) {
+  // Extract the color RGB values
+  $color1_red: red($color1);
+  $color1_green: green($color1);
+  $color1_blue: blue($color1);
+
+  $color2_red: red($color2);
+  $color2_green: green($color2);
+  $color2_blue: blue($color2);
+
+  // Calculate the blended RGB values
+  $blended_red: $color1_red * (1 - $ratio) + $color2_red * $ratio;
+  $blended_green: $color1_green * (1 - $ratio) + $color2_green * $ratio;
+  $blended_blue: $color1_blue * (1 - $ratio) + $color2_blue * $ratio;
+
+  // Convert the blended RGB values back to a color
+  $blended_color: rgb($blended_red, $blended_green, $blended_blue);
+
+  @return $blended_color;
+}

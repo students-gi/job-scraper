@@ -1,0 +1,51 @@
+@use 'functions' as *;
+
+// ====== Design colors ======
+$orange: #f77711;
+$black: #0f0d0e;
+$white: #ffeee0;
+$light-gray: blend($black, $white, 0.7);
+$dark-gray: blend($black, $white, 0.1);
+
+$background: $black;
+$foreground: $orange;
+$text: $white;
+
+// ====== Breakpoints ======
+$breakpoints: (
+  xs: 360px,
+  sm: 480px,
+  md: 750px,
+  lg: 990px,
+  xl: 1600px
+);
+
+
+// ====== Typography ======
+$font-family-heading: Arial, sans-serif;
+$font-family-body: Arial, sans-serif;
+$font-family-icons: 'fontello';
+$font-sizes: (
+  xs: 16px,
+  sm: 16px,
+  md: 18px,
+  lg: 20px,
+  xl: 22px
+);
+$header-sizes: (
+  h1: 3em,
+  h2: 2.5em,
+  h3: 2em,
+  h4: 1.75em,
+  h5: 1.5em,
+  h6: 1.25em
+);
+
+// ====== Padding ======
+$content-padding: (
+  xs: 8px,
+  sm: 12px,
+  md: 15px,
+  lg: 20px,
+  xl: 30px
+);

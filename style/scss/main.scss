@@ -1,0 +1,80 @@
+@use 'variables' as *;
+
+// Default design values
+html {
+  min-width: map-get($breakpoints, xs);
+}
+
+html,
+body {
+  background-color: $background;
+  color: $text;
+}
+
+a {
+  color: $white;
+
+  &:hover {
+    color: $foreground;
+  }
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+
+  a {
+    font-size: 1.2rem;
+    margin: 0.5rem 1rem;
+    text-decoration: underline $foreground;
+  }
+}
+
+button,
+.button {
+  border: 0;
+  padding: 0.5rem 1rem;
+  background-color: $foreground;
+  color: $background;
+  text-decoration: none;
+
+  &:hover {
+    background-color: lighten($foreground, 8%);
+    color: $background;
+  }
+
+  &:active {
+    background-color: darken($foreground, 15%);
+    color: $background;
+  }
+}
+
+// Array iterations
+@each $header, $size in $header-sizes {
+  #{$header} {
+    font-size: $size;
+  }
+}
+
+// ====== Media queries ======
+@each $breakpoint, $value in $breakpoints {
+  @if $breakpoint == xs {
+    // Default styles set from mobile screens
+
+    body {
+      font-size: map-get($font-sizes, $breakpoint);
+      padding: map-get($content-padding, $breakpoint);
+    }
+  }
+
+  @else {
+    @media only screen and (min-width: $value) {
+      // Styles for screens up to the current breakpoint
+
+      body {
+        font-size: map-get($font-sizes, $breakpoint);
+        padding: map-get($content-padding, $breakpoint);
+      }
+    }
+  }
+}
