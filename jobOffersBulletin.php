@@ -14,7 +14,7 @@
         <h1>Saved Job Offers</h1>
         <?php
         // Include code to fetch saved job offers from the database/data files
-        $savedJobOffers = [];
+        $savedJobOffers = $jobOfferRepository->getJobOffers();
 
         // Display saved job offers
         foreach ($savedJobOffers as $jobOffer) : ?>
@@ -49,5 +49,7 @@
 
     </div>
 </body>
+
+<script id="REPO_DUMP"><?php var_dump($savedJobOffers) ?></script>
 
 </html>

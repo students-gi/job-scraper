@@ -4,6 +4,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // Global constants
 const DIR_PROJECT = __DIR__;
+const DIR_DATABASE = DIR_PROJECT . "/database";
 
 // Showing off the contents
 include_once(DIR_PROJECT . "/jobOffersBulletin.php");
