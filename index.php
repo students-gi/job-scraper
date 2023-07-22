@@ -12,6 +12,7 @@ const DIR_DATABASE = DIR_PROJECT . "/database";
 
 // Data structures
 $jobOfferRepository = new JobOfferRepository();
+//$jobOfferRepository->readFromLatestCsv();
 
 // Gonna launch the "background tasks"
 $jobScraperManager = new ScraperManager();
