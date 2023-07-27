@@ -25,10 +25,12 @@ class LikeItScraper extends Scraper
             // Fill in the jobOffers array
             foreach ($apiResponse['data'] as $offer) {
                 $jobOffers[] = new JobOffer(
+                    "likeit_" . $offer['id'],
                     $offer['employer']['name'],
                     $offer['employer']['logo'],
                     $offer['job_position'],
-                    $offer['salary_min'] . '-' . $offer['salary_max'],
+                    $offer['salary_min'],
+                    $offer['salary_max'],
                     self::generateJobOfferLink($offer['job_position'], $offer['id']),
                     $offer['deadline'],
                     "Y-m-d|"

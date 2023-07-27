@@ -7,6 +7,7 @@ use InvalidArgumentException;
 
 class JobOffer
 {
+    private string $offerId;
     private string $companyName;
     private string $companyLogo;
     private string $jobTitle;
@@ -16,26 +17,68 @@ class JobOffer
     private DateTime $offerDeadline;
 
     public function __construct(
+        string $offerId,
         string $companyName,
         string $companyLogo,
         string $jobTitle,
-        string $jobPayInterval,
+        string $jobPayMin,
+        string $jobPayMax,
         string $offerLink,
         string $offerDeadline,
         string $offerDeadlineFormat
     ) {
+        $this->setOfferId($offerId);
         $this->setCompanyName($companyName);
         $this->setCompanyLogo($companyLogo);
         $this->setJobTitle($jobTitle);
-        $this->setJobPay($jobPayInterval);
+        $this->setJobPayMin($jobPayMin);
+        $this->setJobPayMax($jobPayMax);
         $this->setOfferLink($offerLink);
         $this->setOfferDeadline($offerDeadline, $offerDeadlineFormat);
     }
 
     // Setters
+    private function setOfferId(string $offerId): void
+    {
+        $this->offerId = self::decodeUnicode($offerId);
+    }
+
     private function setCompanyName(string $companyName): void
     {
-        $this->companyName = self::decodeUnicode($companyName);
+        $parsedCompanyName = self::decodeUnicode($companyName);
+
+        // Replacing company descriptors with acronyms
+        $parsedCompanyName =  str_replace([
+            "Akciju sabiedrība",
+            "akciju sabiedrība"
+        ], "AS", $parsedCompanyName);
+        $parsedCompanyName =  str_replace([
+            "Sabiedrība ar ierobežotu atbildību",
+            "sabiedrība ar ierobežotu atbildību"
+        ], "SIA", $parsedCompanyName);
+
+        // Relocating the company names to the beginning for consistency
+        $acronymArray = ["AS", "SIA"];
+        foreach ($acronymArray as $acronym) {
+            $lowerAcronym   = strtolower($acronym);
+            $lowerCompany   = strtolower($parsedCompanyName);
+            $phrasePosition = strrpos($lowerCompany, ' ' . $lowerAcronym);
+            $acronymLength  = strlen($lowerAcronym) + 1;
+            $companyLength  = strlen($lowerCompany);
+
+            // Check if the phrase is at the end of the text
+            if ($phrasePosition !== false && ($phrasePosition + $acronymLength) === $companyLength) {
+                // Move the phrase to the front
+                $parsedCompanyName = $acronym . ' '
+                    . substr($parsedCompanyName, 0, $companyLength - $acronymLength);
+                break; // We move only one phrase to the front if found
+            }
+        }
+
+        // Trimming leftover characters
+        $parsedCompanyName = trim($parsedCompanyName,"\t\n\r\0\x0b ,");
+
+        $this->companyName = $parsedCompanyName;
     }
 
     private function setCompanyLogo(string $companyLogo): void
@@ -56,25 +99,20 @@ class JobOffer
         $this->jobTitle = self::decodeUnicode($jobTitle);
     }
 
-    private function setJobPay(string $jobPay): void
+    private function setJobPayMin(string $jobPayMin): void
+    {
+        $this->jobPayMin = self::parseJobPay($jobPayMin);
+    }
+
+    private function setJobPayMax(string $jobPayMax): void
+    {
+        $this->jobPayMax = self::parseJobPay($jobPayMax);
+    }
+
+    private static function parseJobPay(string $jobPay): int
     {
         $jobPay = self::decodeUnicode($jobPay);
-
-        // Extract the lowest estimate from the jobPay string (e.g., "1000$-3000$")
-        $jobPayParts = explode('-', $jobPay);
-
-        // Remove currency signs and any leading/trailing whitespace
-        if (isset($jobPayParts[1])) {
-            $minPayStr = trim($jobPayParts[0], '$€£ ');
-            $maxPayStr = trim($jobPayParts[1], '$€£ ');
-        } else {
-            $minPayStr = 0;
-            $maxPayStr = trim($jobPayParts[0], '$€£ ');
-        }
-
-        // Convert to integer
-        $this->jobPayMin = (int)$minPayStr;
-        $this->jobPayMax = (int)$maxPayStr;
+        return (int) trim($jobPay, '$€£ ');
     }
 
     private function setOfferLink(string $offerLink): void
@@ -89,7 +127,7 @@ class JobOffer
         $this->offerLink = $offerLink;
     }
 
-    private function setOfferDeadline(string $offerDeadline, $offerDeadlineFormat): void
+    private function setOfferDeadline(string $offerDeadline, string $offerDeadlineFormat): void
     {
         $offerDeadline = self::decodeUnicode($offerDeadline);
 
@@ -101,6 +139,11 @@ class JobOffer
 
 
     // Getters
+    public function getOfferId(): string
+    {
+        return $this->offerId;
+    }
+
     public function getCompanyName(): string
     {
         return $this->companyName;
@@ -163,6 +206,7 @@ class JobOffer
         }
 
         return
+            $this->getOfferId()     === $other->getOfferId() &&
             $this->getCompanyName() === $other->getCompanyName() &&
             $this->getJobTitle()    === $other->getJobTitle()    &&
             $this->getJobPayMin()   === $other->getJobPayMin()   &&
@@ -172,7 +216,8 @@ class JobOffer
     public function __hash(): string
     {
         return md5(
-            $this->getCompanyName() .
+                $this->getOfferId() .
+                $this->getCompanyName() .
                 $this->getCompanyLogo() .
                 $this->getJobTitle() .
                 $this->getJobPayMin() .

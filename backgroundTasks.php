@@ -12,8 +12,6 @@ function runBackgroundTasks(ScraperManager $scraperManager, JobOfferRepository $
         $jobOfferRepository->addJobOffer($jobOffer);
     }
 
-    // Run removeDuplicateJobOffers() and removeExpiredJobOffers() every day
-    $jobOfferRepository->removeDuplicateJobOffers();
     $jobOfferRepository->removeExpiredJobOffers();
 
     // Run saveToCsv() once every 3 days

@@ -3,6 +3,7 @@
 namespace scrapers;
 
 use domains\JobOffer;
+use Error;
 
 class NvaScraper extends Scraper
 {
@@ -24,18 +25,30 @@ class NvaScraper extends Scraper
 
             // Fill in the jobOffers array
             foreach ($apiResponse as $offer) {
+                // Parse pay
+                $pay = explode('-', $offer['alga_no_lidz']);
+                if (isset($pay[1])) {
+                    $payMin = $pay[0];
+                    $payMax = $pay[1];
+                }
+                else {
+                    $payMin = 0;
+                    $payMax = $pay[0];
+                }
+
                 $jobOffers[] = new JobOffer(
+                    "nva_" . $offer['id'],
                     $offer['uzn_uznemums_nosaukums'],
                     "", // They don't show company logos off in any way
                     $offer['kla_profesija_nosaukums'],
-                    $offer['alga_no_lidz'],
+                    $payMin,
+                    $payMax,
                     self::generateJobOfferLink($offer['id']),
                     $offer['aktuala_lidz'],
                     "Y-m-d|"
                 );
             }
-        }
-        while (sizeof($apiResponse) > 0);
+        } while (sizeof($apiResponse) > 0);
 
         return $jobOffers;
     }

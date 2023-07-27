@@ -62,19 +62,37 @@ class PrakseLvScraper extends Scraper
             // Parsing the payment
             $jobPayPattern = "/((\d+) līdz )?(\d+) EUR/";
             preg_match($jobPayPattern, $jobMultiInfoString, $matches);
-            $jobPayInterval = $matches[2] .'-'. $matches[3];
+
+            if (isset($matches[3])) {
+                $jobPayMin = $matches[2];
+                $jobPayMax = $matches[3];
+            }
+            elseif (isset($matches[2])) {
+                $jobPayMin = 0;
+                $jobPayMax = $matches[2];
+            }
+            else {
+                $jobPayMin = 0;
+                $jobPayMax = 0;
+            }
 
             // Parsing the deadline
             preg_match("/(\d{2}\.\d{2}\.\d{4})/", $jobMultiInfoString, $matches);
             $jobOfferDeadline=$matches[1];
             $jobOfferDeadlineFormat="d.m.Y|";
 
+            // Parsing the URL
+            $urlString = self::JOBS_URL . $jobNode->evaluate("string(//h2/a/@href)");
+            $idString = preg_match("/\/vacancy\/([^\/]+)/", $urlString);
+
             $jobsArray[] = new JobOffer(
+                "prakse_" . $idString,
                 $jobNode->evaluate("string(//h5)"), // Company title
                 $jobNode->evaluate("string(//img/@src)"), // Company logo
                 $jobNode->evaluate("string(//h2/a)"), // Job title
-                $jobPayInterval,
-                self::JOBS_URL . $jobNode->evaluate("string(//h2/a/@href)"), // Job link,
+                $jobPayMin,
+                $jobPayMax,
+                $urlString, // Job link,
                 $jobOfferDeadline,
                 $jobOfferDeadlineFormat
             );

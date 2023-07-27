@@ -28,10 +28,12 @@ class CvLvScraper extends Scraper
             // Fill in the jobOffers array
             foreach ($jsonResponse['props']['initialReduxState']['search']['vacancies'] as $offer) {
                 $jobOffers[] = new JobOffer(
+                    "cvlv_" . $offer['id'],
                     $offer['employerName'],
                     self::generateLogoLink($offer['logoId']),
                     $offer['positionTitle'],
-                    $offer['salaryFrom'] . '-' . $offer['salaryTo'],
+                    ($offer['salaryFrom'] == null) ? 0 : $offer['salaryFrom'],
+                    ($offer['salaryTo'] == null) ? 0 : $offer['salaryTo'],
                     self::generateJobOfferLink($offer['id']),
                     $offer['expirationDate'],
                     "Y-m-d\TH:i:s.uP"

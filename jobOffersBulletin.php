@@ -18,7 +18,7 @@
 
         // Display saved job offers
         foreach ($savedJobOffers as $jobOffer) : ?>
-            <div class="job-offer">
+            <div id="<?= $jobOffer->getOfferId() ?>" class="job-offer">
                 <div class="job-details">
                     <div class="company-logo">
                         <img src="<?= $jobOffer->getCompanyLogo() ?>" alt="<?= $jobOffer->getCompanyName() ?> logo">
