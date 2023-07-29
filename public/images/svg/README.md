@@ -1,0 +1,1 @@
+All of these SVG files were taken from [Phosphor Icons](https://phosphoricons.com/) under the MIT license, then personally optimized and further compressed using [Vecta.io](https://vecta.io/nano)

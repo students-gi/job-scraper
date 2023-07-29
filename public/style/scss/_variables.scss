@@ -1,11 +1,9 @@
-@use 'functions' as *;
-
 // ====== Design colors ======
 $orange: #f77711;
 $black: #0f0d0e;
 $white: #ffeee0;
-$light-gray: blend($black, $white, 0.7);
-$dark-gray: blend($black, $white, 0.1);
+$light-gray: mix($black, $white, 30%);
+$dark-gray: mix($black, $white, 90%);
 
 $background: $black;
 $foreground: $orange;

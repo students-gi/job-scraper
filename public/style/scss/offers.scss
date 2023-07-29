@@ -1,9 +1,51 @@
 @use 'variables' as *;
-@use 'functions' as *;
 
 $card_background: $dark-gray;
+$icon-size: 2.5rem;
 
-.container {
+#sortContainer,
+#sortContainer>div {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+    gap: calc($icon-size * 0.5);
+}
+
+#sortContainer {
+    gap: calc($icon-size * 0.75);
+
+    .icon {
+        width: $icon-size;
+
+        >svg {
+            fill: $orange;
+        }
+    }
+
+    #sorting .icon {
+        cursor: pointer;
+        // Unsetting the button styles
+        background-color: transparent !important;
+        padding: 0;
+
+        >svg {
+            fill: mix($white, $orange, 50%);
+            transition: opacity 0.3s ease;
+        }
+
+        &.active>svg {
+            fill: $orange;
+        }
+    }
+
+    #order-indicator {
+        border-left: 3px solid $orange;
+        padding-left: calc($icon-size * 0.5);
+    }
+}
+
+#jobContainer {
     margin: 0 auto;
     padding: 20px;
 }
@@ -59,7 +101,7 @@ $card_background: $dark-gray;
 .job-payment {
     padding: 0.5em;
     border-radius: 5px;
-    background-color: blend($black, $dark-gray, 0.3);
+    background-color: mix($black, $dark-gray, 30%);
 }
 
 .offer-deadline {
@@ -75,7 +117,8 @@ $card_background: $dark-gray;
     z-index: 1;
 
 
-    &::before,&::after{
+    &::before,
+    &::after {
         content: "";
         position: absolute;
         left: 0;
@@ -83,6 +126,7 @@ $card_background: $dark-gray;
         height: 50%;
         z-index: -1;
     }
+
     &::before {
         top: 0;
         background-color: $background;
