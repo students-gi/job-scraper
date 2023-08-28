@@ -2,61 +2,106 @@
 
 namespace repositories;
 
+use domains\BlacklistedJobOffer;
 use SplObjectStorage;
-use domains\JobOffer;
 
 class JobOfferBlacklistRepository
 {
-    private static SplObjectStorage $jobOffersBlacklist;
+    private SplObjectStorage $jobOffersBlacklist;
 
     private const BLACKLIST_CSV = DIR_DATABASE . "/blacklist.csv";
+    private const CSV_HEADERS = [
+        "Company name",
+        "Job position title",
+        "Minimum pay",
+        "Maximum pay"
+    ];
 
-    // Setters
-    private static function readCsvDatabase(): array | NULL
+    // Constructor
+    public function __construct()
     {
-        if (!file_exists(self::BLACKLIST_CSV)) {
-            return null;
-        }
-
-        $blacklistedOffers = [];
-        $csvData = array_map('str_getcsv', file(self::BLACKLIST_CSV));
-        foreach ($csvData as $row) {
-            array_push($blacklistedOffers, array(
-                'company_name' => $row[0],
-                'job_title' => $row[1],
-                'minimum_pay' => $row[2],
-                'maximum_pay' => $row[3],
-            ));
-        }
-
-        return $blacklistedOffers;
+        $this->jobOffersBlacklist = new SplObjectStorage();
+        $this->readBlacklistCsv();
     }
 
-    private static function addJobOffer(array $jobOffer): void
+    private function readBlacklistCsv(): bool
     {
-        self::$jobOffersBlacklist->attach(new JobOffer(
-            $jobOffer['company_name'],
-            "",
-            $jobOffer['job_title'],
-            $jobOffer['minimum_pay'] . '-' . $jobOffer['maximum_pay'],
-            "",
-            "0000-01-01",
-            "Y-m-d|"
+        if (!file_exists(self::BLACKLIST_CSV)) {
+            return false;
+        }
+
+        $this->clearJobOffersBlacklist();
+        $csvData = array_map('str_getcsv', file(self::BLACKLIST_CSV));
+        foreach ($csvData as $row) {
+            // Gotta exclude headers from the database
+            if ($row == self::CSV_HEADERS) {
+                continue;
+            }
+
+            self::addJobOffer(
+                $row[0], // companyName
+                $row[1], // jobTitle
+                $row[2], // jobPayMin
+                $row[3]  // jobPayMax
+            );
+        }
+
+        return true;
+    }
+
+    private function clearJobOffersBlacklist(): void
+    {
+        $this->jobOffersBlacklist->removeAll($this->jobOffersBlacklist);
+    }
+
+    // Setters
+    private function addJobOffer(
+        ?string $companyName = null,
+        ?string $jobTitle = null,
+        ?string $jobPayMin = null,
+        ?string $jobPayMax = null
+    ): void {
+        $this->jobOffersBlacklist->attach(new BlacklistedJobOffer(
+            $companyName,
+            $jobTitle,
+            $jobPayMin,
+            $jobPayMax
         ));
     }
 
     // Getters
-    public static function getJobOffersBlacklist(): SplObjectStorage | NULL
+    public function getJobOffersBlacklist(): SplObjectStorage
     {
-        self::$jobOffersBlacklist = new SplObjectStorage();
-        $blacklist = self::readCsvDatabase();
-        if ($blacklist === null) return null;
+        return $this->jobOffersBlacklist;
+    }
 
-        foreach ($blacklist as $blacklistedOffer) {
-            self::addJobOffer($blacklistedOffer);
+    // Destructor
+    public function __destruct()
+    {
+        $this->saveBlacklistCsv();
+    }
+
+    private function saveBlacklistCsv(): bool
+    {
+        $csvFile = fopen(self::BLACKLIST_CSV, 'w');
+
+        if ($csvFile === false) {
+            return false;
         }
 
-        self::$jobOffersBlacklist->rewind();
-        return self::$jobOffersBlacklist;
+        // Gotta save in some headers first, to explain what each column means
+        fputcsv($csvFile, self::CSV_HEADERS);
+
+        foreach ($this->jobOffersBlacklist as $blacklistedJobOffer) {
+            fputcsv($csvFile, [
+                $blacklistedJobOffer->getCompanyName(),
+                $blacklistedJobOffer->getJobTitle(),
+                $blacklistedJobOffer->getJobPayMin(),
+                $blacklistedJobOffer->getJobPayMax(),
+            ]);
+        }
+        fclose($csvFile);
+
+        return true;
     }
 }

@@ -8,6 +8,7 @@ class ComposerStaticInitdf611f88355b5c08d3aba485f4a6c804
 {
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'domains\\BlacklistedJobOffer' => __DIR__ . '/../..' . '/src/domains/BlacklistedJobOffer.php',
         'domains\\JobOffer' => __DIR__ . '/../..' . '/src/domains/JobOffer.php',
         'repositories\\JobOfferBlacklistRepository' => __DIR__ . '/../..' . '/src/repositories/JobOfferBlacklistRepository.php',
         'repositories\\JobOfferRepository' => __DIR__ . '/../..' . '/src/repositories/JobOfferRepository.php',

@@ -60,99 +60,19 @@ class JobOfferRepository
         $currentDate = new DateTime();
         foreach ($this->jobOffers as $jobOffer) {
             if ($jobOffer->getOfferDeadline() <= $currentDate) {
-                unset($jobOffer);
+                $this->jobOffers->detach($jobOffer);
             }
         }
     }
 
-    public function removeDuplicateJobOffers(): void
+    public function filterBlacklistedJobOffers(JobOfferBlacklistRepository $blacklist): void
     {
-        $uniqueJobOffers = new SplObjectStorage();
-        foreach ($this->jobOffers as $jobOffer) {
-            $uniqueJobOffers->attach($jobOffer);
-        }
-        $this->jobOffers = $uniqueJobOffers;
-    }
-
-    public function filterBlacklistedJobOffers(SplObjectStorage $blacklistedJobOffers): void
-    {
-        $this->jobOffers->removeAll($blacklistedJobOffers);
-    }
-
-    // Sorters
-    public function sortJobOffersByPay(): void
-    {
-        // Create an array to temporarily hold the JobOffer objects
-        $auxiliaryArray = $this->getJobOffers();
-
-        // Sort the auxiliary array based on minimum pay first and then by maximum pay
-        usort($auxiliaryArray, function ($a, $b) {
-            // Gotta evaluate the pay variables properly
-            $aMin = $a->getJobPayMin();
-            $aMax = $a->getJobPayMax();
-            $bMin = $b->getJobPayMin();
-            $bMax = $b->getJobPayMax();
-            if ($aMin === 0) {
-                $aMin = $aMax;
+        foreach ($blacklist as $blacklistedJob) {
+            foreach ($this->jobOffers as $jobOffer) {
+                if ($blacklistedJob->filterBlacklistedJobOffers($jobOffer)) {
+                    $this->jobOffers->detach($jobOffer);
+                }
             }
-            if ($bMin === 0) {
-                $bMin = $bMax;
-            }
-            if ($aMax === 0) {
-                $aMax = $aMin;
-            }
-            if ($bMax === 0) {
-                $bMax = $bMin;
-            }
-
-            if ($aMin === $bMin) {
-                return ($aMax <=> $bMax);
-            }
-            return ($aMin <=> $bMin);
-        });
-
-        // Recreate the SortedObjectStorage with sorted JobOffer elements
-        $this->clearJobOffers();
-        foreach ($auxiliaryArray as $jobOffers) {
-            $this->addJobOffer($jobOffers);
-        }
-    }
-
-    public function sortJobOffersByOfferDeadline(): void
-    {
-        // Create an array to temporarily hold the JobOffer objects
-        $auxiliaryArray = $this->getJobOffers();
-
-        // Sort the auxiliary array based on the deadline an offer has
-        usort($auxiliaryArray, function ($a, $b) {
-            $deadlineA = $a->getOfferDeadline();
-            $deadlineB = $b->getOfferDeadline();
-
-            // Compare the offer deadlines
-            $nullReturn = null;
-            if ($deadlineA === null && $deadlineB === null) {
-                // If both deadlines are null, consider them equal
-                $nullReturn = 0;
-            } elseif ($deadlineA === null) {
-                // If $a has a null deadline, it comes before $b
-                $nullReturn = -1;
-            } elseif ($deadlineB === null) {
-                // If $b has a null deadline, it comes before $a
-                $nullReturn = 1;
-            }
-
-            if ($nullReturn !== null) {
-                return $nullReturn;
-            }
-
-            // Special cases didn't occur; Compare the DateTime objects
-            return $deadlineA <=> $deadlineB;
-        });
-
-        // Recreate the SortedObjectStorage with sorted JobOffer elements
-        $this->clearJobOffers();
-        foreach ($auxiliaryArray as $jobOffers) {
-            $this->addJobOffer($jobOffers);
         }
     }
 

@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'domains\\BlacklistedJobOffer' => $baseDir . '/src/domains/BlacklistedJobOffer.php',
     'domains\\JobOffer' => $baseDir . '/src/domains/JobOffer.php',
     'repositories\\JobOfferBlacklistRepository' => $baseDir . '/src/repositories/JobOfferBlacklistRepository.php',
     'repositories\\JobOfferRepository' => $baseDir . '/src/repositories/JobOfferRepository.php',

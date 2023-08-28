@@ -225,4 +225,20 @@ class JobOffer
                 $this->getFormattedOfferDeadline()
         );
     }
+
+    public function __toString(): string
+    {
+        $output = "Job offer object {" . PHP_EOL;
+        $output .= "Offer ID: "         . $this->getOfferId()       . PHP_EOL;
+        $output .= "Company Name: "     . $this->getCompanyName()   . PHP_EOL;
+        $output .= "Company Logo URL: " . $this->getCompanyLogo()   . PHP_EOL;
+        $output .= "Job Title: "        . $this->getJobTitle()      . PHP_EOL;
+        $output .= "Min pay offered: "  . $this->getJobPayMin()     . PHP_EOL;
+        $output .= "Max pay offered: "  . $this->getJobPayMax()     . PHP_EOL;
+        $output .= "Offer Link: "       . $this->getOfferLink()     . PHP_EOL;
+        $output .= "Offer Deadline: "   . $this->getFormattedOfferDeadline() . PHP_EOL;
+        $output .= "}";
+
+        return $output;
+    }
 }
