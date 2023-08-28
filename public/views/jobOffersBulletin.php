@@ -1,5 +1,7 @@
 <?php
 
+const DIR_SVG = DIR_PUBLIC . "/images/svg";
+
 function embedSvgElement($svgFilePath): string
 {
     if (!file_exists($svgFilePath)) {
@@ -78,21 +80,21 @@ function embedSvgElement($svgFilePath): string
     <nav id="sortContainer">
         <div id="sorting">
             <button class="icon payment" onclick="handleSortClick('payment')">
-                <?= embedSvgElement(DIR_PUBLIC . "/images/svg/hand-coins.svg") . PHP_EOL ?>
+                <?= embedSvgElement(DIR_SVG . "/hand-coins.svg") . PHP_EOL ?>
             </button>
             <button class="icon deadline" onclick="handleSortClick('deadline')">
-                <?= embedSvgElement(DIR_PUBLIC . "/images/svg/calendar-x.svg") . PHP_EOL ?>
+                <?= embedSvgElement(DIR_SVG . "/calendar-x.svg") . PHP_EOL ?>
             </button>
         </div>
         <div id="order-indicator">
             <div class="icon unsorted">
-                <?= embedSvgElement(DIR_PUBLIC . "/images/svg/sort-unsorted.svg") . PHP_EOL ?>
+                <?= embedSvgElement(DIR_SVG . "/sort-unsorted.svg") . PHP_EOL ?>
             </div>
             <div class="icon ascending" style="display:none;">
-                <?= embedSvgElement(DIR_PUBLIC . "/images/svg/sort-ascending.svg") . PHP_EOL ?>
+                <?= embedSvgElement(DIR_SVG . "/sort-ascending.svg") . PHP_EOL ?>
             </div>
             <div class="icon descending" style="display:none;">
-                <?= embedSvgElement(DIR_PUBLIC . "/images/svg/sort-descending.svg") . PHP_EOL ?>
+                <?= embedSvgElement(DIR_SVG . "/sort-descending.svg") . PHP_EOL ?>
             </div>
         </div>
     </nav>
