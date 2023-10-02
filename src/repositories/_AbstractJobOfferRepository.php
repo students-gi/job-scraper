@@ -27,6 +27,11 @@ abstract class AbstractJobOfferRepository
         $this->jobOffers = new SplObjectStorage();
     }
 
+    public function __destruct()
+    {
+        $this->exportToCsv();
+    }
+
     // Setters
     public function addJobOffer(JobOffer $jobOffer): void
     {
@@ -45,6 +50,18 @@ abstract class AbstractJobOfferRepository
             yield $this->jobOffers->current();
             $this->jobOffers->next();
         }
+    }
+
+    public function getJobOfferById(string $jobOfferId): ?JobOffer
+    {
+        foreach ($this->getJobOffers() as $jobOffer) {
+            if ($jobOffer->getOfferId() === $jobOfferId) {
+                return $jobOffer;
+            }
+        }
+
+        // The requested job offer wasn't found
+        return null;
     }
 
     // In-memory element manipulations
