@@ -43,7 +43,7 @@ class ValidJobOfferRepository extends AbstractJobOfferRepository
         $filename = self::CSV_FILENAME_BASE . $currentDate . '.csv';
 
         // Check if we're not overwriting stuff
-        if (!empty(self::CSV_DIRECTORY . '/' . $filename)) {
+        if (file_exists(self::CSV_DIRECTORY . '/' . $filename)) {
             return false;
         }
 

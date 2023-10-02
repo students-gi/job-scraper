@@ -12,7 +12,6 @@ const DIR_PUBLIC = DIR_PROJECT . "/public";
 
 // Data structures
 $jobOfferRepository = new ValidJobOfferRepository();
-$jobOfferRepository->getLatestOffers();
 
 // Showing off the contents
 include_once(DIR_PUBLIC . "/views/jobOffersBulletin.php");
