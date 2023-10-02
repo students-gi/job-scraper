@@ -8,10 +8,10 @@ class ComposerStaticInitdf611f88355b5c08d3aba485f4a6c804
 {
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'domains\\BlacklistedJobOffer' => __DIR__ . '/../..' . '/src/domains/BlacklistedJobOffer.php',
         'domains\\JobOffer' => __DIR__ . '/../..' . '/src/domains/JobOffer.php',
-        'repositories\\JobOfferBlacklistRepository' => __DIR__ . '/../..' . '/src/repositories/JobOfferBlacklistRepository.php',
-        'repositories\\JobOfferRepository' => __DIR__ . '/../..' . '/src/repositories/JobOfferRepository.php',
+        'repositories\\AbstractJobOfferRepository' => __DIR__ . '/../..' . '/src/repositories/_AbstractJobOfferRepository.php',
+        'repositories\\BlacklistedJobOfferRepository' => __DIR__ . '/../..' . '/src/repositories/BlacklistedJobOfferRepository.php',
+        'repositories\\ValidJobOfferRepository' => __DIR__ . '/../..' . '/src/repositories/ValidJobOfferRepository.php',
         'scrapers\\CvLvScraper' => __DIR__ . '/../..' . '/src/scrapers/cv_lv.php',
         'scrapers\\LikeItScraper' => __DIR__ . '/../..' . '/src/scrapers/likeIT_lv.php',
         'scrapers\\NvaScraper' => __DIR__ . '/../..' . '/src/scrapers/cvvp_nva_lv.php',

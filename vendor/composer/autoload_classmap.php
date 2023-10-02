@@ -7,10 +7,10 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
-    'domains\\BlacklistedJobOffer' => $baseDir . '/src/domains/BlacklistedJobOffer.php',
     'domains\\JobOffer' => $baseDir . '/src/domains/JobOffer.php',
-    'repositories\\JobOfferBlacklistRepository' => $baseDir . '/src/repositories/JobOfferBlacklistRepository.php',
-    'repositories\\JobOfferRepository' => $baseDir . '/src/repositories/JobOfferRepository.php',
+    'repositories\\AbstractJobOfferRepository' => $baseDir . '/src/repositories/_AbstractJobOfferRepository.php',
+    'repositories\\BlacklistedJobOfferRepository' => $baseDir . '/src/repositories/BlacklistedJobOfferRepository.php',
+    'repositories\\ValidJobOfferRepository' => $baseDir . '/src/repositories/ValidJobOfferRepository.php',
     'scrapers\\CvLvScraper' => $baseDir . '/src/scrapers/cv_lv.php',
     'scrapers\\LikeItScraper' => $baseDir . '/src/scrapers/likeIT_lv.php',
     'scrapers\\NvaScraper' => $baseDir . '/src/scrapers/cvvp_nva_lv.php',

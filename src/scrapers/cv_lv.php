@@ -8,8 +8,8 @@ use DOMXPath;
 
 class CvLvScraper extends Scraper
 {
-    private const SCRAPING_URL = 'https://cv.lv/en/search?categories%5B0%5D=INFORMATION_TECHNOLOGY&keywords%5B0%5D=progamm%C4%93t%C4%81js&fuzzy=true';
-    private const SCRAPING_ITEMS = 5;
+    private const SCRAPING_URL = 'https://cv.lv/lv/search?categories[0]=INFORMATION_TECHNOLOGY&keywords[0]=Programm&fuzzy=true';
+    private const SCRAPING_ITEMS = 50;
     private const JOBS_URL = 'https://cv.lv/lv/vacancy/';
     private const ICONS_URL = 'https://cv.lv/api/v1/files-service/';
 
@@ -30,7 +30,7 @@ class CvLvScraper extends Scraper
                 $jobOffers[] = new JobOffer(
                     "cvlv_" . $offer['id'],
                     $offer['employerName'],
-                    self::generateLogoLink($offer['logoId']),
+                    isset($offer['logoId']) ?? self::generateLogoLink($offer['logoId']) :: null,
                     $offer['positionTitle'],
                     ($offer['salaryFrom'] == null) ? 0 : $offer['salaryFrom'],
                     ($offer['salaryTo'] == null) ? 0 : $offer['salaryTo'],
@@ -40,9 +40,9 @@ class CvLvScraper extends Scraper
                 );
             }
 
-            // Waiting 2-6 sec to not overload the site and avoid a ban
-            usleep((mt_rand(2000, 6000) / 1000) * 1000000);
-        } while ($jsonResponse['props']['initialReduxState']['search']['total'] >= $currentPage * 5);
+            // Waiting 1-3 sec to not overload the site and avoid a ban
+            usleep((mt_rand(1000, 3000) / 1000) * 1000000);
+        } while ($jsonResponse['props']['initialReduxState']['search']['total'] >= $currentPage * self::SCRAPING_ITEMS);
 
         return $jobOffers;
     }
