@@ -4,6 +4,7 @@ namespace repositories;
 
 use SplObjectStorage;
 use domains\JobOffer;
+use Generator;
 
 abstract class AbstractJobOfferRepository
 {
@@ -36,15 +37,14 @@ abstract class AbstractJobOfferRepository
     }
 
     // Getters
-    public function getJobOffers(): array
+    public function getJobOffers(): Generator
     {
         $this->jobOffers->rewind();
-        $jobOffersArray = [];
+
         while ($this->jobOffers->valid()) {
-            $jobOffersArray[] = $this->jobOffers->current();
+            yield $this->jobOffers->current();
             $this->jobOffers->next();
         }
-        return $jobOffersArray;
     }
 
     // In-memory element manipulations

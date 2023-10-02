@@ -100,11 +100,8 @@ function embedSvgElement($svgFilePath): string
     </nav>
     <div id="jobContainer">
         <?php
-        // Include code to fetch saved job offers from the database/data files
-        $savedJobOffers = $jobOfferRepository->getJobOffers();
-
         // Display saved job offers
-        foreach ($savedJobOffers as $jobOffer) : ?>
+        foreach ($jobOfferRepository->getJobOffers() as $jobOffer) : ?>
             <div id="<?= $jobOffer->getOfferId() ?>" class="job-offer">
                 <div class="job-details">
                     <div class="company-logo">
