@@ -30,7 +30,7 @@ class CvLvScraper extends Scraper
                 $jobOffers[] = new JobOffer(
                     "cvlv_" . $offer['id'],
                     $offer['employerName'],
-                    isset($offer['logoId']) ?? self::generateLogoLink($offer['logoId']) :: null,
+                    isset($offer['logoId']) ?? self::generateLogoLink($offer['logoId'])::null,
                     $offer['positionTitle'],
                     ($offer['salaryFrom'] == null) ? 0 : $offer['salaryFrom'],
                     ($offer['salaryTo'] == null) ? 0 : $offer['salaryTo'],

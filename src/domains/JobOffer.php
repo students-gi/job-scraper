@@ -76,7 +76,7 @@ class JobOffer
         }
 
         // Trimming leftover characters
-        $parsedCompanyName = trim($parsedCompanyName,"\t\n\r\0\x0b ,");
+        $parsedCompanyName = trim($parsedCompanyName, "\t\n\r\0\x0b ,");
 
         $this->companyName = $parsedCompanyName;
     }
@@ -216,7 +216,7 @@ class JobOffer
     public function __hash(): string
     {
         return md5(
-                $this->getOfferId() .
+            $this->getOfferId() .
                 $this->getCompanyName() .
                 $this->getCompanyLogo() .
                 $this->getJobTitle() .

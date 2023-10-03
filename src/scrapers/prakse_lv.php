@@ -48,7 +48,8 @@ class PrakseLvScraper extends Scraper
         $xpath = new DOMXPath($httpResponse);
         $jobNodesArray = $xpath->evaluate(
             "//div[@class='col-main']" .
-            "//section[contains(@class, 'item') and not(contains(@class, 'promoted'))]");
+            "//section[contains(@class, 'item') and not(contains(@class, 'promoted'))]"
+        );
 
         $jobsArray = [];
         foreach ($jobNodesArray as $jobNode) {
@@ -68,20 +69,18 @@ class PrakseLvScraper extends Scraper
             if (isset($matches[3])) {
                 $jobPayMin = $matches[2];
                 $jobPayMax = $matches[3];
-            }
-            elseif (isset($matches[2])) {
+            } elseif (isset($matches[2])) {
                 $jobPayMin = 0;
                 $jobPayMax = $matches[2];
-            }
-            else {
+            } else {
                 $jobPayMin = 0;
                 $jobPayMax = 0;
             }
 
             // Parsing the deadline
             preg_match("/(\d{2}\.\d{2}\.\d{4})/", $jobMultiInfoString, $matches);
-            $jobOfferDeadline=$matches[1];
-            $jobOfferDeadlineFormat="d.m.Y|";
+            $jobOfferDeadline = $matches[1];
+            $jobOfferDeadlineFormat = "d.m.Y|";
 
             // Parsing the URL
             $urlString = self::JOBS_URL . $jobNode->evaluate("string(//h2/a/@href)");

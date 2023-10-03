@@ -30,8 +30,7 @@ class NvaScraper extends Scraper
                 if (isset($pay[1])) {
                     $payMin = $pay[0];
                     $payMax = $pay[1];
-                }
-                else {
+                } else {
                     $payMin = 0;
                     $payMax = $pay[0];
                 }

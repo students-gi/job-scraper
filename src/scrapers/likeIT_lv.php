@@ -36,8 +36,7 @@ class LikeItScraper extends Scraper
                     "Y-m-d|"
                 );
             }
-        }
-        while ($apiResponse['current_page'] != $apiResponse['last_page']);
+        } while ($apiResponse['current_page'] != $apiResponse['last_page']);
 
         return $jobOffers;
     }
