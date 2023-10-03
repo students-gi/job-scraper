@@ -17,6 +17,17 @@ class BlacklistService
         self::$blacklist = new BlacklistedJobOfferRepository;
     }
 
+    public function getSizesOfOfferRepos(): array
+    {
+        $sizes = [
+            'all' => self::$completeList->getJobOfferCount(),
+            'blacklist' => self::$blacklist->getJobOfferCount()
+        ];
+        return array_merge($sizes, [
+            'whitelist' => ($sizes['all'] - $sizes['blacklist'])
+        ]);
+    }
+
     public function getFilteredJobOffers(): Generator
     {
         foreach (self::$completeList->getJobOffers() as $jobOffer) {
@@ -37,6 +48,7 @@ class BlacklistService
             yield $jobOffer;
         }
     }
+
     /**
      * Adds a job offer to the blacklist.
      *

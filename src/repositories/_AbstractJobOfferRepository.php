@@ -52,6 +52,10 @@ abstract class AbstractJobOfferRepository
         }
     }
 
+    public function getJobOfferCount(): int {
+        return count($this->jobOffers);
+    }
+
     /**
      * Search for all jobOffers that match the specified criteria.
      *

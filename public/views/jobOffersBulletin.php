@@ -112,7 +112,8 @@ function embedSvgElement($svgFilePath): string
 </head>
 
 <body>
-    <h1>Saved Job Offers</h1>
+    <?php $jobCounts = $jobOfferRepository->getSizesofOfferRepos(); ?>
+    <h1>Found Job Offers (<?= $jobCounts['whitelist'] ?> / <?= $jobCounts['all'] ?>)</h1>
     <nav id="sortContainer">
         <div id="sorting">
             <button class="icon payment" onclick="handleSortClick('payment')">
