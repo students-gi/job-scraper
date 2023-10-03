@@ -46,7 +46,9 @@ class PrakseLvScraper extends Scraper
     {
         // Selecting all the job application items
         $xpath = new DOMXPath($httpResponse);
-        $jobNodesArray = $xpath->evaluate("//div[@class='col-main']//section[contains(@class, 'item') and not(contains(@class, 'promoted'))]");
+        $jobNodesArray = $xpath->evaluate(
+            "//div[@class='col-main']" .
+            "//section[contains(@class, 'item') and not(contains(@class, 'promoted'))]");
 
         $jobsArray = [];
         foreach ($jobNodesArray as $jobNode) {
@@ -83,7 +85,9 @@ class PrakseLvScraper extends Scraper
 
             // Parsing the URL
             $urlString = self::JOBS_URL . $jobNode->evaluate("string(//h2/a/@href)");
-            $idString = preg_match("/\/vacancy\/([^\/]+)/", $urlString);
+            $idPattern = '/\/vacancy\/(\d+)/';
+            preg_match($idPattern, $urlString, $idMatches);
+            $idString = $idMatches[1];
 
             $jobsArray[] = new JobOffer(
                 "prakse_" . $idString,
