@@ -18,6 +18,7 @@ class ComposerStaticInitdf611f88355b5c08d3aba485f4a6c804
         'scrapers\\PrakseLvScraper' => __DIR__ . '/../..' . '/src/scrapers/prakse_lv.php',
         'scrapers\\Scraper' => __DIR__ . '/../..' . '/src/scrapers/_Scraper.php',
         'scrapers\\ScraperManager' => __DIR__ . '/../..' . '/src/scrapers/_ScraperManager.php',
+        'services\\BlacklistService' => __DIR__ . '/../..' . '/src/services/BlacklistService.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

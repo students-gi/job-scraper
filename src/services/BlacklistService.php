@@ -14,12 +14,13 @@ class BlacklistService
     public function __construct()
     {
         self::$completeList = new ValidJobOfferRepository;
-        self::$blacklist = new BlacklistedJobOfferRepository();
+        self::$blacklist = new BlacklistedJobOfferRepository;
     }
 
     public function getFilteredJobOffers(): Generator
     {
-        foreach (self::$completeList as $jobOffer) {
+        foreach (self::$completeList->getJobOffers() as $jobOffer) {
+            error_log("Checking " . $jobOffer->getOfferId());
             $checkedOffer = self::$blacklist->searchJobOffers(
                 [
                     // Since there can be the same offer on multiple sites,

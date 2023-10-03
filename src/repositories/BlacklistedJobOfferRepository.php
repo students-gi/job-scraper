@@ -33,7 +33,7 @@ class BlacklistedJobOfferRepository extends AbstractJobOfferRepository
         $latestBlacklist = $blacklists[0];
 
         // Read it in memory
-        return $this->readFromCsv($latestBlacklist);
+        return $this->readFromCsv(basename($latestBlacklist));
     }
 
     protected function exportToCsv(): bool

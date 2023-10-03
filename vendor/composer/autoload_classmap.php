@@ -17,4 +17,5 @@ return array(
     'scrapers\\PrakseLvScraper' => $baseDir . '/src/scrapers/prakse_lv.php',
     'scrapers\\Scraper' => $baseDir . '/src/scrapers/_Scraper.php',
     'scrapers\\ScraperManager' => $baseDir . '/src/scrapers/_ScraperManager.php',
+    'services\\BlacklistService' => $baseDir . '/src/services/BlacklistService.php',
 );

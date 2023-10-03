@@ -101,7 +101,7 @@ function embedSvgElement($svgFilePath): string
     <div id="jobContainer">
         <?php
         // Display saved job offers
-        foreach ($jobOfferRepository->getJobOffers() as $jobOffer) : ?>
+        foreach ($jobOfferRepository->getFilteredJobOffers() as $jobOffer) : ?>
             <div id="<?= $jobOffer->getOfferId() ?>" class="job-offer">
                 <div class="job-details">
                     <div class="company-logo">
@@ -135,9 +135,5 @@ function embedSvgElement($svgFilePath): string
 
     </div>
 </body>
-
-<script id="REPO_DUMP">
-    <?php var_dump($savedJobOffers) ?>
-</script>
 
 </html>
