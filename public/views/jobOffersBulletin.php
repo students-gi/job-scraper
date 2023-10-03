@@ -94,6 +94,20 @@ function embedSvgElement($svgFilePath): string
                 alert('Failed to blacklist the job offer.');
             }
         }
+
+        // Highlight the '.job-offer' container when it's visited
+        function highlightJobOffer(event) {
+            var closestJobOffer = event.target.closest('.job-offer');
+            closestJobOffer.classList.add('visited');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add a click event listener to each link
+            var links = document.querySelectorAll('#jobContainer .job-title a');
+            links.forEach(function(link) {
+                link.addEventListener('click', highlightJobOffer);
+            });
+        });
     </script>
 </head>
 
