@@ -130,6 +130,9 @@ function embedSvgElement($svgFilePath): string
                 <div class="offer-deadline">
                     <?= $jobOffer->getFormattedOfferDeadline() . PHP_EOL  ?>
                 </div>
+                <button class="icon offer-blacklist">
+                    <?= embedSvgElement(DIR_SVG . "/trash.svg") . PHP_EOL ?>
+                </button>
             </div>
         <?php endforeach; ?>
 

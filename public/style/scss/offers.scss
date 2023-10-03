@@ -1,166 +1,189 @@
-@use 'variables' as *;
+@use "variables" as *;
 
 $card_background: $dark-gray;
 $icon-size: 2.5rem;
 
 #sortContainer,
-#sortContainer>div {
-    display: flex;
-    flex-direction: row;
-    align-content: center;
-    justify-content: center;
-    gap: calc($icon-size * 0.5);
+#sortContainer > div {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  gap: calc($icon-size * 0.5);
 }
 
 #sortContainer {
-    gap: calc($icon-size * 0.75);
+  gap: calc($icon-size * 0.75);
 
-    .icon {
-        width: $icon-size;
+  .icon {
+    width: $icon-size;
 
-        >svg {
-            fill: $orange;
-        }
+    > svg {
+      fill: $orange;
+    }
+  }
+
+  #sorting .icon {
+    cursor: pointer;
+    // Unsetting the button styles
+    background-color: transparent;
+    padding: 0;
+
+    > svg {
+      fill: mix($white, $orange, 50%);
+      transition: opacity 0.3s ease;
     }
 
-    #sorting .icon {
-        cursor: pointer;
-        // Unsetting the button styles
-        background-color: transparent !important;
-        padding: 0;
-
-        >svg {
-            fill: mix($white, $orange, 50%);
-            transition: opacity 0.3s ease;
-        }
-
-        &.active>svg {
-            fill: $orange;
-        }
+    &.active > svg {
+      fill: $orange;
     }
+  }
 
-    #order-indicator {
-        border-left: 3px solid $orange;
-        padding-left: calc($icon-size * 0.5);
-    }
+  #order-indicator {
+    border-left: 3px solid $orange;
+    padding-left: calc($icon-size * 0.5);
+  }
 }
 
 #jobContainer {
-    margin: 0 auto;
-    padding: 20px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .job-offer {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid $light-gray;
-    border-radius: 5px;
-    background-color: $card_background;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid $light-gray;
+  border-radius: 5px;
+  background-color: $card_background;
 }
 
 .job-details {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
 }
 
 .company-logo {
-    flex-grow: 0;
+  flex-grow: 0;
 
-    width: 5em;
-    min-width: 5em;
-    height: 5em;
-    margin-right: 1em;
+  width: 5em;
+  min-width: 5em;
+  height: 5em;
+  margin-right: 1em;
 
-    img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 }
 
 .job-overview {
-    flex-grow: 1;
-    flex-direction: column;
+  flex-grow: 1;
+  flex-direction: column;
 
-    .job-title {
-        font-size: map-get($header-sizes, h4);
-        font-weight: bold;
-    }
+  .job-title {
+    font-size: map-get($header-sizes, h4);
+    font-weight: bold;
+  }
 
-    .company-name {
-        font-size: map-get($header-sizes, h5);
-        font-weight: bold;
-        color: $orange;
-    }
+  .company-name {
+    font-size: map-get($header-sizes, h5);
+    font-weight: bold;
+    color: $orange;
+  }
 }
 
 .job-payment {
-    padding: 0.5em;
-    border-radius: 5px;
-    background-color: mix($black, $dark-gray, 30%);
+  padding: 0.5em;
+  border-radius: 5px;
+  background-color: mix($black, $dark-gray, 30%);
 }
 
 .offer-deadline {
+  position: absolute;
+  top: -0.5em;
+  right: 10px;
+  background-color: none;
+  padding: 0 5px;
+  font-size: 1em;
+  font-weight: bold;
+  line-height: 1;
+  color: $orange;
+  z-index: 1;
+
+  &::before,
+  &::after {
+    content: "";
     position: absolute;
-    top: -0.5em;
-    right: 10px;
-    background-color: none;
-    padding: 0 5px;
-    font-size: 1em;
-    font-weight: bold;
-    line-height: 1;
-    color: $orange;
-    z-index: 1;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    z-index: -1;
+  }
 
+  &::before {
+    top: 0;
+    background-color: $background;
+  }
 
-    &::before,
-    &::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        width: 100%;
-        height: 50%;
-        z-index: -1;
+  &::after {
+    top: 50%;
+    background-color: $card_background;
+  }
+}
+
+.offer-blacklist {
+  position: absolute;
+  top: 50%;
+  transform: translate(50%, -50%);
+  right: 0;
+
+  // Masking this together with the background
+  background-color: $background;
+  padding: 5px;
+  border: 1px solid #b7aba1;
+  border-radius: 100%;
+
+  &:hover, &:active, &:focus-visible {
+    background-color: crimson;
+    cursor: pointer;
+
+    > svg {
+      fill: $background;
     }
+  }
 
-    &::before {
-        top: 0;
-        background-color: $background;
-    }
-
-    &::after {
-        top: 50%;
-        background-color: $card_background;
-    }
+  > svg {
+    fill: crimson;
+  }
 }
 
 // ====== Media queries ======
-@each $breakpoint,
-$value in $breakpoints {
-    $breakpoint-padding: map-get($content-padding, $breakpoint);
+@each $breakpoint, $value in $breakpoints {
+  $breakpoint-padding: map-get($content-padding, $breakpoint);
 
-    @if $breakpoint ==xs {
-        // Default styles set from mobile screens
+  @if $breakpoint == xs {
+    // Default styles set from mobile screens
 
-        .job-offer {
-            margin: $breakpoint-padding ;
-            padding: calc($breakpoint-padding/2);
-        }
-
+    .job-offer {
+      margin: $breakpoint-padding;
+      padding: calc($breakpoint-padding/2);
+      padding-right: calc($breakpoint-padding*2);
     }
+  } @else {
+    @media only screen and (min-width: $value) {
+      // Styles for screens up to the current breakpoint
 
-    @else {
-        @media only screen and (min-width: $value) {
-            // Styles for screens up to the current breakpoint
-
-            .job-offer {
-                margin: $breakpoint-padding ;
-                padding: calc($breakpoint-padding/2);
-            }
-        }
+      .job-offer {
+        margin: $breakpoint-padding;
+        padding: calc($breakpoint-padding/2);
+        padding-right: calc($breakpoint-padding*2);
+      }
     }
+  }
 }
