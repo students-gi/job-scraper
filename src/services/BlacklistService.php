@@ -20,8 +20,7 @@ class BlacklistService
     public function getFilteredJobOffers(): Generator
     {
         foreach (self::$completeList->getJobOffers() as $jobOffer) {
-            error_log("Checking " . $jobOffer->getOfferId());
-            $checkedOffer = self::$blacklist->searchJobOffers(
+            $checkedOffer = self::$blacklist->searchIfJobOfferExists(
                 [
                     // Since there can be the same offer on multiple sites,
                     // we check for more 'general' job descriptions, so to say
@@ -29,7 +28,7 @@ class BlacklistService
                     'companyName'   => $jobOffer->getCompanyName()
                 ]
             );
-            if (!isset($checkedOffer)) {
+            if ($checkedOffer !== false) {
                 // We skip the blacklisted offers
                 continue;
             }
@@ -38,28 +37,38 @@ class BlacklistService
             yield $jobOffer;
         }
     }
-
-    public function addJobOfferToBlacklist($jobOfferId)
+    /**
+     * Adds a job offer to the blacklist.
+     *
+     * This method checks if the provided job offer ID exists in the complete
+     * job offer list.
+     * If it does, and the offer is not already blacklisted, it adds the job
+     * offer to the blacklist. This prevents duplicates and ensures that only
+     * valid job offers are blacklisted.
+     *
+     * @param string $jobOfferId
+     * The unique identifier of the job offer to blacklist.
+     * @return boolean
+     * Response whether the provided offer was blacklisted.
+     * NOTE: true is returned even if the ID provided was a duplicate!
+     */
+    public function addJobOfferToBlacklist($jobOfferId): bool
     {
         // Check if there is an offer like this blacklisted already
-        $blacklistedOffer = self::$blacklist->searchJobOffers(
-            ['offerId' => $jobOfferId]
-        );
-        if (isset($blacklistedOffer)) {
+        if (self::$blacklist->searchIfJobOfferExists(['offerId' => $jobOfferId]) !== false) {
             // Prevent duplicates
-            return;
+            return true;
         }
 
         // Check if this job offer exists
-        $blacklistedOffer = self::$completeList->searchJobOffers(
-            ['offerId' => $jobOfferId]
-        );
-        if (!isset($blacklistedOffer)) {
+        $blacklistedOffer = self::$completeList->searchIfJobOfferExists(['offerId' => $jobOfferId]);
+        if ($blacklistedOffer === false) {
             // Prevent fakes
-            return;
+            return false;
         }
 
         // Add the job offer to the blacklist
         self::$blacklist->addJobOffer($blacklistedOffer);
+        return true;
     }
 }

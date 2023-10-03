@@ -72,6 +72,28 @@ function embedSvgElement($svgFilePath): string
             ascendingIcon.style.display = sortAscending ? 'none' : 'block';
             descendingIcon.style.display = sortAscending ? 'block' : 'none';
         }
+
+        function blacklistJobOffer(buttonElement) {
+            // Get the job offer ID from the element's ID attribute
+            const jobOfferContainer = buttonElement.parentElement;
+            const jobOfferId = jobOfferContainer.id;
+
+            // Make the request
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'index.php', false);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            var data = 'action=blacklist&jobOfferId=' + encodeURIComponent(jobOfferId);
+            xhr.send(data);
+
+            // Handle the server response
+            if (xhr.status === 200) {
+                // Remove the job offer container from the DOM
+                jobOfferContainer.remove();
+            } else {
+                // Display an error message
+                alert('Failed to blacklist the job offer.');
+            }
+        }
     </script>
 </head>
 
@@ -130,7 +152,7 @@ function embedSvgElement($svgFilePath): string
                 <div class="offer-deadline">
                     <?= $jobOffer->getFormattedOfferDeadline() . PHP_EOL  ?>
                 </div>
-                <button class="icon offer-blacklist">
+                <button class="icon offer-blacklist" onclick="blacklistJobOffer(this)">
                     <?= embedSvgElement(DIR_SVG . "/trash.svg") . PHP_EOL ?>
                 </button>
             </div>

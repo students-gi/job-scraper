@@ -53,7 +53,7 @@ abstract class AbstractJobOfferRepository
     }
 
     /**
-     * Search for jobOffers that match the specified criteria.
+     * Search for all jobOffers that match the specified criteria.
      *
      * @param array $searchParameters
      * An associative array of search criteria and their expected values.
@@ -61,7 +61,7 @@ abstract class AbstractJobOfferRepository
      * @return Generator
      * A generator yielding job offers that meet all the specified criteria.
      */
-    public function searchJobOffers(array $searchParameters): Generator
+    public function searchAllJobOffers(array $searchParameters): Generator
     {
         foreach ($this->getJobOffers() as $jobOffer) {
             $matchesAllCriteria = true;
@@ -83,6 +83,27 @@ abstract class AbstractJobOfferRepository
                 yield $jobOffer;
             }
         }
+    }
+
+    /**
+     * Check if a job offer exists in the search results based on criteria.
+     *
+     * @param array $searchParameters
+     * An associative array of search criteria and their expected values.
+     * Keys are JobOffer object property values, appropriately capitalized.
+     * @return JobOffer|bool
+     * The 1st matching JobOffer instance if one exists, false otherwise.
+     */
+    public function searchIfJobOfferExists(array $searchParameters): JobOffer|bool
+    {
+        foreach ($this->searchAllJobOffers($searchParameters) as $jobOffer) {
+            // If the searchAllJobOffers generator yields at least one result,
+            // it means a matching job offer exists.
+            return $jobOffer;
+        }
+
+        // No matching job offer found.
+        return false;
     }
 
     // In-memory element manipulations
