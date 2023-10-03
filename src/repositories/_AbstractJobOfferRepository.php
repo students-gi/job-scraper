@@ -52,16 +52,37 @@ abstract class AbstractJobOfferRepository
         }
     }
 
-    public function getJobOfferById(string $jobOfferId): ?JobOffer
+    /**
+     * Search for jobOffers that match the specified criteria.
+     *
+     * @param array $searchParameters
+     * An associative array of search criteria and their expected values.
+     * Keys are JobOffer object property values, appropriately capitalized.
+     * @return Generator
+     * A generator yielding job offers that meet all the specified criteria.
+     */
+    public function searchJobOffers(array $searchParameters): Generator
     {
         foreach ($this->getJobOffers() as $jobOffer) {
-            if ($jobOffer->getOfferId() === $jobOfferId) {
-                return $jobOffer;
+            $matchesAllCriteria = true;
+
+            foreach ($searchParameters as $parameter => $value) {
+                $getter = 'get' . ucfirst($parameter);
+                if (!method_exists($jobOffer, $getter)) {
+                    // Invalid param was passed, skipping
+                    continue;
+                }
+                if ($jobOffer->$getter() !== $value) {
+                    // Value checked was not the one wanted, breaking the loop
+                    $matchesAllCriteria = false;
+                    break;
+                }
+            }
+
+            if ($matchesAllCriteria) {
+                yield $jobOffer;
             }
         }
-
-        // The requested job offer wasn't found
-        return null;
     }
 
     // In-memory element manipulations
