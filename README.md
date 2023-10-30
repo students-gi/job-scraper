@@ -8,16 +8,18 @@ Rest is gonna be in Latvian, so you better get a translator handy
 
 ## Funcionalitāte
 
-1. Nolasa info no visām mājaslapām kam izveidots reģistrēts `scraper` modulis
-2. ~~Filtrē ārā *blacklisted* datus~~
-3. ~~Sakārto vakances loģiskā secībā~~
-4. Saglabā atrastos darba piedāvājumus vietējā datu bāzē vai datu failos.
-5. Attēlo nolasītos datus atvērtajā pārlūkā
+1. Lietotne nolasa info no visām mājaslapām kam izveidots reģistrēts `scraper` modulis
+1. No atrastajiem darba piedāvājumiem, filtrē ārā *blacklisted* datus
+1. Saglabā atrastos darba piedāvājumus lokālos datu failos.
+1. Attēlo nolasītos datus atvērtajā pārlūkā
 
 #### TODO:
-- Sakārtot vakanču filtrāciju lai tā normāli strādā
-- Salabot kārtošanu, lai pēc tās dati netiktu zaudēti
+- Ļaut lietotājam paslēpt piedāvājumu kā "pieteiktu", neizdzēšot to no datubāzes
+- Ļaut lietotājam apskatīt tikai tos piedāvājumus, uz kuriem viņš ir atzīmējis kā "pieteicies"
+- Piedāvāt iespēju integrēt datu saglabāšanu iekš datubāzes, nevis atsevišķiem failiem
+- Sniegt iespēju mainīt darba filtrēšanu starp vairākām kategorijām
 - Padarīt vakanču saglabāšanu un atjaunināšanu automātisku
+- Padarīt programmu lietojamu vairākiem lietotājiem vienlaikus (*hosted solution*)
 
 ## Instalācija
 
