@@ -9,25 +9,40 @@ use DOMXPath;
 
 class PrakseLvScraper extends HtmlScraper
 {
-    private const SCRAPING_URL = 'https://www.prakse.lv/vacancies/1/3/9/0/0';
+    private const SCRAPING_URL = 'https://www.prakse.lv/vacancies';
     private const JOBS_URL = 'https://www.prakse.lv';
 
     public static function scrapeJobOffers(): array
     {
         $jobOffers = [];
+        $pageNum = 0;
 
-        // Making the page request
-        $httpBody = self::httpQuery(self::SCRAPING_URL);
+        while ($pageNum < 5) {
+            // Allowing pagination to work
+            $pageNum++;
+            $completeUrl = self::SCRAPING_URL . "/$pageNum/0/9/0/0";
+            $httpBody = self::httpQuery($completeUrl);
 
-        // Extracting the job offers in this page
-        $xpathExpression =
-            "//div[@class='col-main']" .
-            "//section[contains(@class, 'item') and not(contains(@class, 'promoted'))]";
-        $htmlJobOffers = self::parseHttpResponseAsHtml($httpBody, $xpathExpression);
+            // Extracting the job offers in this page
+            $xpathExpression =
+                "//div[@class='col-main']" .
+                "//section[contains(@class, 'item') and not(contains(@class, 'promoted'))]";
+            $htmlJobOffers = self::parseHttpResponseAsHtml($httpBody, $xpathExpression);
 
-        $jobOffersFromPage = self::parseHtmlAsJobOffers($htmlJobOffers);
-        $jobOffers = array_merge($jobOffers, $jobOffersFromPage);
+            $jobOffersFromPage = self::parseHtmlAsJobOffers($htmlJobOffers);
+            $jobOffers = array_merge($jobOffers, $jobOffersFromPage);
 
+            /**
+             * Checking if a page is not available is a pain here,
+             * since they don't do any redirects always just serving with a 200.
+             * So, we need to be a bit sneakier: by counting all items.
+             */
+            $itemsTotalXpath = "string(//div[@id='filter']//b)";
+            $itemsTotal = (int) self::parseHttpResponseAsHtml($httpBody, $itemsTotalXpath);
+            if ($itemsTotal <= count($jobOffers)) {
+                break;
+            }
+        }
         return $jobOffers;
     }
 

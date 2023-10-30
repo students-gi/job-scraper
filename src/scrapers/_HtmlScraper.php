@@ -51,7 +51,7 @@ abstract class HtmlScraper extends Scraper
     protected static function parseHttpResponseAsHtml(
         string $httpBody,
         string $xpathExpression
-    ): DOMNodeList
+    ): DOMNodeList | string | false
     {
         // Convert the plaintext HTML into something parsable
         libxml_use_internal_errors(true); // Suppressing bad HTML warnings
