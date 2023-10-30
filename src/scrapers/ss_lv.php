@@ -9,18 +9,29 @@ use DOMXPath;
 class SsLvScraper extends Scraper
 {
     private const SCRAPING_URLS = [
-        'https://www.ss.com/lv/work/are-required/network-administrator/',
-        'https://www.ss.com/lv/work/are-required/web-designer/',
-        'https://www.ss.com/lv/work/are-required/programmer/'
+        'https://www.ss.com/lv/work/are-required/network-administrator',
+        'https://www.ss.com/lv/work/are-required/web-designer',
+        'https://www.ss.com/lv/work/are-required/programmer'
     ];
-    private const JOBS_URL = 'https://www.ss.lv/';
+    private const JOBS_URL = 'https://www.ss.lv';
 
     public static function scrapeJobOffers(): array
     {
         $jobOffers = [];
 
         foreach (self::SCRAPING_URLS as $url) {
-            $jobOffers = array_merge($jobOffers, self::httpQuery($url));
+            $pageNum = 0;
+            while (true) {
+                // Allowing pagination to work
+                $pageNum++;
+                $completeUrl = "$url/page$pageNum.html";
+                $jobOffersInPage = self::httpQuery($completeUrl);
+
+                if ($jobOffersInPage === false) {
+                    break;
+                }
+                $jobOffers = array_merge($jobOffers, $jobOffersInPage);
+            }
         }
 
         return $jobOffers;
@@ -31,10 +42,10 @@ class SsLvScraper extends Scraper
      * and checks if there is data/job offers to be scraped.
      *
      * @param string $url The URL to send the HTTP request to.
-     * @return array[] An empty array, if the URL was not found/wasn't valid/was redirected.
+     * @return false if the URL was not found/wasn't valid/was redirected.
      * @return self::scrapeHtml The scraped HTML jobOffers inside of an array.
      */
-    private static function httpQuery(string $url): array
+    private static function httpQuery(string $url): array | bool
     {
         // Initialize cURL
         $ch = curl_init();
@@ -50,7 +61,7 @@ class SsLvScraper extends Scraper
 
         // Check if we aren't getting redirected or something
         if ($responseCode != 200) {
-            return [];
+            return false;
         }
 
         return self::scrapeHtml($httpBody);
@@ -75,7 +86,7 @@ class SsLvScraper extends Scraper
         $jobsArray = [];
 
         // Translating all of these rows into JobOffers
-        foreach ($jobNodesArray as $jobNode){
+        foreach ($jobNodesArray as $jobNode) {
             // Gotta turn it into a "proper" xml object first
             $nodeDomDocument = new DOMDocument();
             $jobNode = $nodeDomDocument->importNode($jobNode, true);
