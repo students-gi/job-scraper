@@ -26,7 +26,7 @@ abstract class Scraper
     protected static function httpQuery(
         string $url,
         array $header = []
-    ): array | bool {
+    ): string | false {
         // Initialize cURL
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -44,7 +44,6 @@ abstract class Scraper
             return false;
         }
 
-        // Execute the cURL request
         return $httpBody;
     }
 }

@@ -13,11 +13,13 @@ class ComposerStaticInitdf611f88355b5c08d3aba485f4a6c804
         'repositories\\BlacklistedJobOfferRepository' => __DIR__ . '/../..' . '/src/repositories/BlacklistedJobOfferRepository.php',
         'repositories\\ValidJobOfferRepository' => __DIR__ . '/../..' . '/src/repositories/ValidJobOfferRepository.php',
         'scrapers\\CvLvScraper' => __DIR__ . '/../..' . '/src/scrapers/cv_lv.php',
+        'scrapers\\HtmlScraper' => __DIR__ . '/../..' . '/src/scrapers/_HtmlScraper.php',
         'scrapers\\LikeItScraper' => __DIR__ . '/../..' . '/src/scrapers/likeIT_lv.php',
         'scrapers\\NvaScraper' => __DIR__ . '/../..' . '/src/scrapers/cvvp_nva_lv.php',
         'scrapers\\PrakseLvScraper' => __DIR__ . '/../..' . '/src/scrapers/prakse_lv.php',
         'scrapers\\Scraper' => __DIR__ . '/../..' . '/src/scrapers/_Scraper.php',
         'scrapers\\ScraperManager' => __DIR__ . '/../..' . '/src/scrapers/_ScraperManager.php',
+        'scrapers\\SsLvScraper' => __DIR__ . '/../..' . '/src/scrapers/ss_lv.php',
         'services\\BlacklistService' => __DIR__ . '/../..' . '/src/services/BlacklistService.php',
     );
 

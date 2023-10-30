@@ -32,9 +32,10 @@ abstract class HtmlScraper extends Scraper
     protected static function httpQuery(
         string $url,
         array $header = []
-    ): array | bool {
+    ): string | false {
         $header[] = 'Accept: text/html';
-        return parent::httpQuery($url, $header);
+        $httpBody = parent::httpQuery($url, $header);
+        return $httpBody;
     }
 
     /**
