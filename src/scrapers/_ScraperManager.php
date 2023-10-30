@@ -16,8 +16,8 @@ class ScraperManager
             // new LikeItScraper(),
             // new CvLvScraper(),
             // new NvaScraper(),
-            // new PrakseLvScraper(),
-            new SsLvScraper()
+            new PrakseLvScraper(),
+            // new SsLvScraper()
         ] as $scraper) {
             $this->scrapers->attach($scraper);
         }
