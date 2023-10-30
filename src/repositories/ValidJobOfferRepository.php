@@ -22,7 +22,7 @@ class ValidJobOfferRepository extends AbstractJobOfferRepository
             }
 
             // Save the data
-            $this->exportToCsv();
+            // $this->exportToCsv();
         }
     }
 
