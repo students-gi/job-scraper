@@ -13,9 +13,9 @@ class ScraperManager
         $this->scrapers = new SplObjectStorage();
 
         foreach ([
-            new LikeItScraper(),
+            // new LikeItScraper(),
             // new CvLvScraper(),
-            // new NvaScraper(),
+            new NvaScraper(),
             // new PrakseLvScraper(),
             // new SsLvScraper()
         ] as $scraper) {
