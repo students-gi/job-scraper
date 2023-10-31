@@ -13,11 +13,11 @@ class ScraperManager
         $this->scrapers = new SplObjectStorage();
 
         foreach ([
-            // new LikeItScraper(),
+            new LikeItScraper(),
             new CvLvScraper(),
-            // new NvaScraper(),
-            // new PrakseLvScraper(),
-            // new SsLvScraper()
+            new NvaScraper(),
+            new PrakseLvScraper(),
+            new SsLvScraper()
         ] as $scraper) {
             $this->scrapers->attach($scraper);
         }
