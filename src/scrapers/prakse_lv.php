@@ -67,6 +67,13 @@ class PrakseLvScraper extends HtmlScraper
             // Gotta more specifically parse out certain info
             $jobMultiInfoString = $jobNode->evaluate("string(//ul/li)");
 
+            // Check if the offer is an internship
+            $internshipPattern = "/Prakse •/i";
+            if (preg_match($internshipPattern, $jobMultiInfoString)) {
+                // We don't need internships; skip this entry
+                continue;
+            }
+
             // Parsing the payment
             $jobPayPattern = "/((\d+) līdz )?(\d+) EUR/";
             preg_match($jobPayPattern, $jobMultiInfoString, $matches);
