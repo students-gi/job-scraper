@@ -14,8 +14,8 @@ class ScraperManager
 
         foreach ([
             // new LikeItScraper(),
-            // new CvLvScraper(),
-            new NvaScraper(),
+            new CvLvScraper(),
+            // new NvaScraper(),
             // new PrakseLvScraper(),
             // new SsLvScraper()
         ] as $scraper) {

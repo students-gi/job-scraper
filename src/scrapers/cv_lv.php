@@ -6,77 +6,120 @@ use domains\JobOffer;
 use DOMDocument;
 use DOMXPath;
 
-class CvLvScraper extends Scraper
+class CvLvScraper extends JsonScraper
 {
-    private const SCRAPING_URL = 'https://cv.lv/lv/search?categories[0]=INFORMATION_TECHNOLOGY&keywords[0]=Programm&fuzzy=true';
+    private const SCRAPING_URL =
+        'https://cv.lv/lv/search'
+        . '?categories[0]=INFORMATION_TECHNOLOGY'
+        . '&keywords[0]=Programm'
+        . '&fuzzy=true';
     private const SCRAPING_ITEMS = 50;
     private const JOBS_URL = 'https://cv.lv/lv/vacancy/';
     private const ICONS_URL = 'https://cv.lv/api/v1/files-service/';
 
     public static function scrapeJobOffers(): array
     {
-        $currentPage = 0;
         $jobOffers = [];
+        $pageNum = 0;
 
         do {
-            $currentPage++;
-            $jsonResponse = self::fetchJsonData($currentPage);
-            if ($jsonResponse == null) {
+            // Get the API's response
+            $pageNum++;
+            $completeUrl = self::SCRAPING_URL
+                . '&limit=' . self::SCRAPING_ITEMS
+                . '&offset=' . (($pageNum - 1) * self::SCRAPING_ITEMS);
+            $httpBody = self::httpQuery($completeUrl);
+
+            if ($httpBody === false) {
                 break;
             }
 
-            // Fill in the jobOffers array
-            foreach ($jsonResponse['props']['initialReduxState']['search']['vacancies'] as $offer) {
-                $jobOffers[] = new JobOffer(
-                    "cvlv_" . $offer['id'],
-                    $offer['employerName'],
-                    isset($offer['logoId']) ?? self::generateLogoLink($offer['logoId'])::null,
-                    $offer['positionTitle'],
-                    ($offer['salaryFrom'] == null) ? 0 : $offer['salaryFrom'],
-                    ($offer['salaryTo'] == null) ? 0 : $offer['salaryTo'],
-                    self::generateJobOfferLink($offer['id']),
-                    $offer['expirationDate'],
-                    "Y-m-d\TH:i:s.uP"
-                );
-            }
+            // Extract the JSON section we need to parse
+            $jsonArray = self::extractJsonData($httpBody);
 
-            // Waiting 1-3 sec to not overload the site and avoid a ban
-            usleep((mt_rand(1000, 3000) / 1000) * 1000000);
-        } while ($jsonResponse['props']['initialReduxState']['search']['total'] >= $currentPage * self::SCRAPING_ITEMS);
+            // Extracting the job offers in this JSON
+            $jobOffers = array_merge(
+                $jobOffers,
+                self::parseJsonAsJobOffers($jsonArray)
+            );
+
+            // Checking item counts n such
+            $maxItems = $jsonArray['props']['initialReduxState']['search']['total'];
+        } while ($maxItems >= $pageNum * self::SCRAPING_ITEMS);
 
         return $jobOffers;
     }
 
-    private static function fetchJsonData(int $pageNumber): ?array
+    protected static function parseJsonAsJobOffers(array $jsonArray): array
     {
-        $pageQuery = "&limit=" . self::SCRAPING_ITEMS
-            . "&offset=" . (($pageNumber - 1) * self::SCRAPING_ITEMS);
+        // Extract the data we require
+        $jsonJobOffersKeys = [
+            'id',
+            'employerName',
+            'logoId',
+            'positionTitle',
+            'salaryFrom',
+            'salaryTo',
+            'expirationDate'
+        ];
+        $jsonJobOffers = self::extractRequiredArrayKeys(
+            $jsonArray,
+            $jsonJobOffersKeys,
+            'props>initialReduxState>search>vacancies'
+        );
 
-        // Initialize cURL
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, (self::SCRAPING_URL . $pageQuery));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: text/html']);
-        curl_setopt($ch, CURLOPT_ENCODING, '');
+        $jobOffers = [];
 
-        // Execute the cURL request
-        $httpBody = curl_exec($ch);
-        curl_close($ch);
+        // Fill in the jobOffers array
+        foreach ($jsonJobOffers as $jsonJobOffer) {
+            $jobOffers[] = new JobOffer(
+                "cvlv_" . $jsonJobOffer['id'],
+                $jsonJobOffer['employerName'],
+                self::generateLogoLink($jsonJobOffer['logoId']),
+                $jsonJobOffer['positionTitle'],
+                $jsonJobOffer['salaryFrom'] ?? 0,
+                $jsonJobOffer['salaryTo'] ?? 0,
+                self::generateJobOfferLink($jsonJobOffer['id']),
+                $jsonJobOffer['expirationDate'],
+                "Y-m-d\TH:i:s.uP"
+            );
+        }
 
-        // Parse the JSON from the HTML response
-        libxml_use_internal_errors(true); // Suppressing bad HTML warnings
-        $htmlBody = new DOMDocument();
-        $htmlBody->loadHTML($httpBody);
-        $xpath = new DOMXPath($htmlBody);
-
-        $scriptNodes = $xpath->evaluate('//script[@id="__NEXT_DATA__"]');
-        $jsonData = $scriptNodes[0]->textContent;
-
-        return json_decode($jsonData, true);
+        return $jobOffers;
     }
 
-    private static function generateLogoLink(string $logoId): string
+    /**
+     * Extracts the page's JSON data about the page contents
+     * from a plaintext HTML string.
+     *
+     * @param string $httpBody The plaintext HTML needing JSON data extraction.
+     *
+     * @return array|null The extracted JSON data as an associated array,
+     * or null if no data was found.
+     */
+    private static function extractJsonData(string $httpBody): array
     {
+        // Convert the plaintext HTML into something parsable
+        libxml_use_internal_errors(true); // Suppressing bad HTML warnings
+        $html = new DOMDocument();
+        $html->loadHTML($httpBody);
+        libxml_use_internal_errors(false); // Supression done; we can continue
+
+        // Extracting the JSON section
+        $xpathExpression = '//script[@id="__NEXT_DATA__"]';
+        $xpath = new DOMXPath($html);
+        $scriptNodes = $xpath->evaluate($xpathExpression);
+        $jsonData = $scriptNodes[0]->textContent;
+
+        // Convert the plaintext JSON into an associated array
+        return self::parseHttpResponseAsJson($jsonData);
+    }
+
+    private static function generateLogoLink(?string $logoId): string
+    {
+        if ($logoId === null) {
+            return '';
+        }
         return self::ICONS_URL . $logoId;
     }
 
