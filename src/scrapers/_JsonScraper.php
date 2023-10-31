@@ -12,7 +12,7 @@ abstract class JsonScraper extends Scraper
      *
      * It should return an array of valid JobOffer elements.
      **/
-    abstract protected static function parseJsonAsJobOffers(array $jobOfferJson): array;
+    abstract protected static function parseJsonAsJobOffers(array $jsonArray): array;
 
     /**
      * Executes an HTTP request to the passed URL
@@ -36,44 +36,57 @@ abstract class JsonScraper extends Scraper
     }
 
     /**
-     * Interprets an HTTP response body as JSON and returns a subset of data.
+     * Interprets an HTTP response body as JSON and returns an asociated array.
      * Used to parse the response from the httpQuery() method
      * and select only the key-value pairs required for a jobOffer object.
      *
      * @param string $httpBody The plaintext JSON needing to be interpreted.
+     *
+     * @return array The JSON interpreted as an associative array
+     */
+    protected static function parseHttpResponseAsJson(string $httpBody): array
+    {
+        // Interpret the plaintext as JSON
+        // Yeah, we probably don't actually need a separate function for this, but eh
+        return json_decode($httpBody, true);
+    }
+
+    /**
+     * Extracts a subset of key-value pairs from a JSON array.
+     * Used to minimize and organize the output of parseHttpResponseAsJson(),
+     * compacting data to that which is required for the creation of a jobOffer.
+     *
+     * @param array $jsonArray The JSON array to extract data from
      * @param array $jsonKeys The keys that contain job info details, relative to the parent.
-     * @param string $parentJsonKeys The parent container that contains all job info.
+     * @param string $parentJsonKey The parent container that contains all job info.
      *
      * Child keys are separated with '>'.
      * So in order to access the 'value' in {'parent':{'child':'value'}},
      * you would submit 'parent>child' into the $jsonKeys array.
-     *
-     * @return DOMNodeList The list of valid elements
      */
-    protected static function parseHttpResponseAsJson(
-        string $httpBody,
-        array $jobJsonKeys,
-        string $parentJsonKeys = ''
+    protected static function extractRequiredArrayKeys(
+        array $jsonArray,
+        array $subsetJsonKeys,
+        string $parentJsonKey = ''
     ): array
     {
-        // Interpret the plaintext as JSON
-        $jsonArray = json_decode($httpBody, true);
 
         // Select the parent container, if a non-root one is defined
-        if ($parentJsonKeys !== '') {
-            $parentKeys = explode('>', $parentJsonKeys);
+        if ($parentJsonKey !== '') {
+            $parentKeys = explode('>', $parentJsonKey);
             foreach ($parentKeys as $key) {
                 $jsonArray = $jsonArray[$key];
             }
         }
 
-        $subset = [];
+        $jsonSubset = [];
 
-        // Now the loop within the loop withn the loop to strip out what we need
+        // Now the triple loop to strip out only what we need
         foreach ($jsonArray as $jobOfferData) {
+            // This contains the data for just 1 job offer
             $jobOfferSortedData = [];
 
-            foreach ($jobJsonKeys as $key) {
+            foreach ($subsetJsonKeys as $key) {
                 $parts = explode('>', $key);
 
                 // Pull out the proper value we need
@@ -81,8 +94,7 @@ abstract class JsonScraper extends Scraper
                 foreach ($parts as $part) {
                     if (isset($value[$part])) {
                         $value = $value[$part];
-                    }
-                    else {
+                    } else {
                         $value = null;
                         break;
                     }
@@ -93,9 +105,9 @@ abstract class JsonScraper extends Scraper
             }
 
             // Add this cleaned-up job offer data to the return array
-            $subset[] = $jobOfferSortedData;
+            $jsonSubset[] = $jobOfferSortedData;
         }
 
-        return $subset;
+        return $jsonSubset;
     }
 }

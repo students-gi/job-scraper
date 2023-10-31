@@ -13,6 +13,7 @@ return array(
     'repositories\\ValidJobOfferRepository' => $baseDir . '/src/repositories/ValidJobOfferRepository.php',
     'scrapers\\CvLvScraper' => $baseDir . '/src/scrapers/cv_lv.php',
     'scrapers\\HtmlScraper' => $baseDir . '/src/scrapers/_HtmlScraper.php',
+    'scrapers\\JsonScraper' => $baseDir . '/src/scrapers/_JsonScraper.php',
     'scrapers\\LikeItScraper' => $baseDir . '/src/scrapers/likeIT_lv.php',
     'scrapers\\NvaScraper' => $baseDir . '/src/scrapers/cvvp_nva_lv.php',
     'scrapers\\PrakseLvScraper' => $baseDir . '/src/scrapers/prakse_lv.php',

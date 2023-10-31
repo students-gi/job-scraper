@@ -14,6 +14,7 @@ class ComposerStaticInitdf611f88355b5c08d3aba485f4a6c804
         'repositories\\ValidJobOfferRepository' => __DIR__ . '/../..' . '/src/repositories/ValidJobOfferRepository.php',
         'scrapers\\CvLvScraper' => __DIR__ . '/../..' . '/src/scrapers/cv_lv.php',
         'scrapers\\HtmlScraper' => __DIR__ . '/../..' . '/src/scrapers/_HtmlScraper.php',
+        'scrapers\\JsonScraper' => __DIR__ . '/../..' . '/src/scrapers/_JsonScraper.php',
         'scrapers\\LikeItScraper' => __DIR__ . '/../..' . '/src/scrapers/likeIT_lv.php',
         'scrapers\\NvaScraper' => __DIR__ . '/../..' . '/src/scrapers/cvvp_nva_lv.php',
         'scrapers\\PrakseLvScraper' => __DIR__ . '/../..' . '/src/scrapers/prakse_lv.php',
