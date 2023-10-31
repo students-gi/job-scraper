@@ -4,56 +4,61 @@ namespace scrapers;
 
 use domains\JobOffer;
 use DOMDocument;
+use DOMNodeList;
 use DOMXPath;
 
-class PrakseLvScraper extends Scraper
+class PrakseLvScraper extends HtmlScraper
 {
-    private const SCRAPING_URL = 'https://www.prakse.lv/vacancies/1/3/9/0/0';
+    private const SCRAPING_URL = 'https://www.prakse.lv/vacancies';
     private const JOBS_URL = 'https://www.prakse.lv';
 
     public static function scrapeJobOffers(): array
     {
+        $jobOffers = [];
+        $pageNum = 0;
 
-        $httpResponse = self::readWebsiteContent();
-        $jobOffers = self::parseWebsiteContent($httpResponse);
-        if ($jobOffers == null) {
-            return null;
+        while ($pageNum < 5) {
+            // Allowing pagination to work
+            $pageNum++;
+            $completeUrl = self::SCRAPING_URL . "/$pageNum/0/9/0/0";
+            $httpBody = self::httpQuery($completeUrl);
+
+            // Extracting the job offers in this page
+            $xpathExpression =
+                "//div[@class='col-main']" .
+                "//section[contains(@class, 'item') and not(contains(@class, 'promoted'))]";
+            $htmlJobOffers = self::parseHttpResponseAsHtml($httpBody, $xpathExpression);
+
+            $jobOffersFromPage = self::parseHtmlAsJobOffers($htmlJobOffers);
+            $jobOffers = array_merge($jobOffers, $jobOffersFromPage);
+
+            /**
+             * Checking if a page is not available is a pain here,
+             * since they don't do any redirects always just serving with a 200.
+             * So, we need to be a bit sneakier: by counting all items.
+             */
+            $itemsTotalXpath = "string(//div[@id='filter']//b)";
+            $itemsTotal = (int) self::parseHttpResponseAsHtml($httpBody, $itemsTotalXpath);
+            if ($itemsTotal <= count($jobOffers)) {
+                break;
+            }
         }
         return $jobOffers;
     }
 
-    private static function readWebsiteContent(): DOMDocument
+    /**
+     * Parses the HTML response body and returns an array of JobOffer objects.
+     *
+     * @param string $httpBody The HTML response body to be parsed.
+     *
+     * @return array The array of valid JobOffer elements.
+     */
+     protected static function parseHtmlAsJobOffers(DOMNodeList $htmlJobOfferNodes): array
     {
-        // Initialize cURL
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, (self::SCRAPING_URL));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: text/html']);
-        curl_setopt($ch, CURLOPT_ENCODING, '');
-
-        // Execute the cURL request
-        $httpBody = curl_exec($ch);
-        curl_close($ch);
-
-        // Parse the JSON from the HTML response
-        libxml_use_internal_errors(true); // Suppressing bad HTML warnings
-        $htmlBody = new DOMDocument();
-        $htmlBody->loadHTML($httpBody);
-        return $htmlBody;
-    }
-
-    private static function parseWebsiteContent(DOMDocument $httpResponse)
-    {
-        // Selecting all the job application items
-        $xpath = new DOMXPath($httpResponse);
-        $jobNodesArray = $xpath->evaluate(
-            "//div[@class='col-main']" .
-            "//section[contains(@class, 'item') and not(contains(@class, 'promoted'))]"
-        );
-
         $jobsArray = [];
-        foreach ($jobNodesArray as $jobNode) {
-            // Gotta turn it into a "proper" xml object first
+
+        foreach ($htmlJobOfferNodes as $jobNode) {
+            // Turning each node into a proper and valid XML-compliant HTML
             $nodeDomDocument = new DOMDocument();
             $jobNode = $nodeDomDocument->importNode($jobNode, true);
             $nodeDomDocument->appendChild($jobNode);
@@ -102,10 +107,5 @@ class PrakseLvScraper extends Scraper
         }
 
         return $jobsArray;
-    }
-
-    public static function scraperTest()
-    {
-        return self::parseWebsiteContent(self::readWebsiteContent());
     }
 }

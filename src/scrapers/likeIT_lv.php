@@ -4,54 +4,86 @@ namespace scrapers;
 
 use domains\JobOffer;
 
-class LikeItScraper extends Scraper
+class LikeItScraper extends JsonScraper
 {
-    private const SCRAPING_URL = 'https://api.likeit.lv/api/v1/offers?search=&category%5B%5D=10&category%5B%5D=40%5B%5D=&type%5B%5D=&ordering=Date+added&tag%5B%5D=';
+    private const SCRAPING_URL =
+    'https://api.likeit.lv/api/v1/offers?' .
+        'search=&category%5B%5D=10' .
+        '&category%5B%5D=40%5B%5D=' .
+        '&type%5B%5D=' .
+        '&ordering=Date+added' .
+        '&tag%5B%5D=';
     private const SCRAPING_ITEMS = 50;
     private const JOBS_URL = 'https://likeit.lv/job/';
 
     public static function scrapeJobOffers(): array
     {
-        $currentPage = 0;
         $jobOffers = [];
+        $pageNum = 0;
+
         do {
-            // Get the API JSON contents
-            $currentPage++;
-            $apiResponse = self::fetchJsonData($currentPage);
-            if ($apiResponse == null) {
+            // Get the API's response
+            $pageNum++;
+            $completeUrl = self::SCRAPING_URL
+                . "&per_page=" . self::SCRAPING_ITEMS
+                . "&page=" . $pageNum;
+            $httpBody = self::httpQuery($completeUrl);
+
+            if ($httpBody === false) {
                 break;
             }
 
-            // Fill in the jobOffers array
-            foreach ($apiResponse['data'] as $offer) {
-                $jobOffers[] = new JobOffer(
-                    "likeit_" . $offer['id'],
-                    $offer['employer']['name'],
-                    $offer['employer']['logo'],
-                    $offer['job_position'],
-                    $offer['salary_min'],
-                    $offer['salary_max'],
-                    self::generateJobOfferLink($offer['job_position'], $offer['id']),
-                    $offer['deadline'],
-                    "Y-m-d|"
-                );
-            }
-        } while ($apiResponse['current_page'] != $apiResponse['last_page']);
+            $jsonArray = self::parseHttpResponseAsJson($httpBody);
+
+            // Extracting the job offers in this JSON
+            $jobOffers = array_merge(
+                $jobOffers,
+                self::parseJsonAsJobOffers($jsonArray)
+            );
+        } while ($jsonArray['current_page'] != $jsonArray['last_page']);
 
         return $jobOffers;
     }
 
-    private static function fetchJsonData(int $pageNumber): ?array
+    protected static function parseJsonAsJobOffers(array $jsonArray): array
     {
-        $pageQuery = "&per_page=" . self::SCRAPING_ITEMS
-            . "&page=" . $pageNumber;
-        // Perform API request and fetch JSON response
-        $json = @file_get_contents(self::SCRAPING_URL . $pageQuery);
-        if ($json === false) {
-            return null;
+        // Extract the data we require
+        $jsonJobOffersKeys = [
+            'id',
+            'employer>name',
+            'employer>logo',
+            'job_position',
+            'salary_min',
+            'salary_max',
+            'deadline'
+        ];
+        $jsonJobOffers = self::extractRequiredArrayKeys(
+            $jsonArray,
+            $jsonJobOffersKeys,
+            'data'
+        );
+
+        $jobOffers = [];
+
+        // Fill in the jobOffers array
+        foreach ($jsonJobOffers as $jsonJobOffer) {
+            $jobOffers[] = new JobOffer(
+                "likeit_" . $jsonJobOffer['id'],
+                $jsonJobOffer['employer>name'],
+                $jsonJobOffer['employer>logo'],
+                $jsonJobOffer['job_position'],
+                $jsonJobOffer['salary_min'],
+                $jsonJobOffer['salary_max'],
+                self::generateJobOfferLink(
+                    $jsonJobOffer['job_position'],
+                    $jsonJobOffer['id']
+                ),
+                $jsonJobOffer['deadline'],
+                "Y-m-d|"
+            );
         }
 
-        return json_decode($json, true);
+        return $jobOffers;
     }
 
     private static function generateJobOfferLink(string $jobPosition, int $postingId): string

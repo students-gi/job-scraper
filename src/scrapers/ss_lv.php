@@ -4,9 +4,10 @@ namespace scrapers;
 
 use domains\JobOffer;
 use DOMDocument;
+use DOMNodeList;
 use DOMXPath;
 
-class SsLvScraper extends Scraper
+class SsLvScraper extends HtmlScraper
 {
     private const SCRAPING_URLS = [
         'https://www.ss.com/lv/work/are-required/network-administrator',
@@ -25,12 +26,23 @@ class SsLvScraper extends Scraper
                 // Allowing pagination to work
                 $pageNum++;
                 $completeUrl = "$url/page$pageNum.html";
-                $jobOffersInPage = self::httpQuery($completeUrl);
+                $httpBody = self::httpQuery($completeUrl);
 
-                if ($jobOffersInPage === false) {
+                if ($httpBody === false) {
+                    // There is no next page; we got redirected to the 1st one.
+                    // We don't need to continue scraping this category
                     break;
                 }
-                $jobOffers = array_merge($jobOffers, $jobOffersInPage);
+
+                // Extracting the job offers in this page
+                $xpathExpression =
+                    "//form[@id='filter_frm']" .
+                    "//table[@align='center']" .
+                    "//tr[starts-with(@id, 'tr_') and translate(substring(@id, 4), '1234567890', '') = '']";
+                $htmlJobOffers = self::parseHttpResponseAsHtml($httpBody, $xpathExpression);
+
+                $jobOffersFromPage = self::parseHtmlAsJobOffers($htmlJobOffers);
+                $jobOffers = array_merge($jobOffers, $jobOffersFromPage);
             }
         }
 
@@ -38,74 +50,31 @@ class SsLvScraper extends Scraper
     }
 
     /**
-     * Executes an HTTP request to the specified URL
-     * and checks if there is data/job offers to be scraped.
+     * Parses the HTML response body and returns an array of JobOffer objects.
      *
-     * @param string $url The URL to send the HTTP request to.
-     * @return false if the URL was not found/wasn't valid/was redirected.
-     * @return self::scrapeHtml The scraped HTML jobOffers inside of an array.
+     * @param string $httpBody The HTML response body to be parsed.
+     *
+     * @return array The array of valid JobOffer elements.
      */
-    private static function httpQuery(string $url): array | bool
+     protected static function parseHtmlAsJobOffers(DOMNodeList $htmlJobOfferNodes): array
     {
-        // Initialize cURL
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: text/html']);
-        curl_setopt($ch, CURLOPT_ENCODING, '');
-
-        // Execute the cURL request
-        $httpBody = curl_exec($ch);
-        $responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        // Check if we aren't getting redirected or something
-        if ($responseCode != 200) {
-            return false;
-        }
-
-        return self::scrapeHtml($httpBody);
-    }
-
-    private static function scrapeHtml(string $httpBody): array
-    {
-        // Parse convert the HTML into something parsable
-        libxml_use_internal_errors(true); // Suppressing bad HTML warnings
-        $html = new DOMDocument();
-        $html->loadHTML($httpBody);
-        libxml_use_internal_errors(false); // Supression done; we can continue
-
-        // Selecting all the job application items
-        $xpath = new DOMXPath($html);
-        $jobNodesArray = $xpath->evaluate(
-            "//form[@id='filter_frm']" .
-            "//table[@align='center']" .
-            "//tr[starts-with(@id, 'tr_') and translate(substring(@id, 4), '1234567890', '') = '']"
-        );
-
         $jobsArray = [];
 
-        // Translating all of these rows into JobOffers
-        foreach ($jobNodesArray as $jobNode) {
-            // Gotta turn it into a "proper" xml object first
+        foreach ($htmlJobOfferNodes as $jobNode) {
+            // Turning each node into a proper and valid XML-compliant HTML
             $nodeDomDocument = new DOMDocument();
             $jobNode = $nodeDomDocument->importNode($jobNode, true);
             $nodeDomDocument->appendChild($jobNode);
             $jobNode = new DOMXPath($nodeDomDocument);
 
-            // Read out the offer's ID
+            // Find the job offer ID
             $jobId = $jobNode->evaluate('string(@id)');
             $jobId = str_replace('tr_', '', $jobId);
 
-            // Getting the company name
-            $jobCompany = $jobNode->evaluate("//td[@class='msga2-o pp6']")
-                ->item(0)
-                ->nodeValue;
-
             // Adding the request to the array
             $jobsArray[] = new JobOffer(
-                "ss_" . $jobId,
-                $jobCompany,
+                "ss_" . $jobId, // Job offer ID
+                $jobNode->evaluate("string(//td[@class='msga2-o pp6'])"), // Company title (if one was placed)
                 $jobNode->evaluate("string(//img/@src)"), // Company logo
                 $jobNode->evaluate("string(//a[@id='dm_$jobId'])"), // Job title
                 '', // Minimum job pay often isn't mentioned in SS job ads
