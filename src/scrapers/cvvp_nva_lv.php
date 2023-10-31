@@ -6,7 +6,10 @@ use domains\JobOffer;
 
 class NvaScraper extends JsonScraper
 {
-    private const SCRAPING_URL = 'https://cvvp.nva.gov.lv/data/pub_vakance_list?kla_darbibas_joma_id=35073957&nosaukums=progr';
+    private const SCRAPING_URL =
+        'https://cvvp.nva.gov.lv/data/pub_vakance_list?'
+        . 'kla_darbibas_joma_id=35073957'
+        . '&nosaukums=progr';
     private const SCRAPING_ITEMS = 25;
     private const JOBS_URL = 'https://cvvp.nva.gov.lv/#/pub/vakances/';
 
