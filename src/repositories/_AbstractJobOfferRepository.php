@@ -36,9 +36,14 @@ abstract class AbstractJobOfferRepository
     public function addJobOffer(JobOffer $jobOffer): void
     {
         // Preventing duplicates
-        if (!$this->jobOffers->contains($jobOffer)) {
-            $this->jobOffers->attach($jobOffer);
+        $exists = $this->searchIfJobOfferExists( [
+            "offerId" => $jobOffer->getOfferId()
+        ] );
+        if ($exists) {
+            return;
         }
+
+        $this->jobOffers->attach($jobOffer);
     }
 
     // Getters
@@ -95,10 +100,10 @@ abstract class AbstractJobOfferRepository
      * @param array $searchParameters
      * An associative array of search criteria and their expected values.
      * Keys are JobOffer object property values, appropriately capitalized.
-     * @return JobOffer|bool
+     * @return JobOffer|false
      * The 1st matching JobOffer instance if one exists, false otherwise.
      */
-    public function searchIfJobOfferExists(array $searchParameters): JobOffer|bool
+    public function searchIfJobOfferExists(array $searchParameters): JobOffer|false
     {
         foreach ($this->searchAllJobOffers($searchParameters) as $jobOffer) {
             // If the searchAllJobOffers generator yields at least one result,
